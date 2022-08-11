@@ -91,28 +91,28 @@ def is_battery():
 
 @bot.hybrid_command(name="check_battery", description="Return current battery status")
 async def chk_btr(ctx):
-	ctx.defer()
+	await ctx.defer()
 	is_battery()
 	battery = json.loads(os.popen("termux-battery-status").read())
-	details = f"""Battery status: {battery.get('status').lower()}
+	details = f"""Battery status: {battery.get('status').lower().capitalize()}
 Charge: {battery.get('percentage')}%
 Temperature: {round(battery.get('temperature'))}°C"""
 	await ctx.send(details)
 
 @bot.hybrid_command(name="stop_checking_battery", description="Cancel check_battery task", check=is_battery)
 async def stop_chk_btr(ctx):
-	ctx.defer()
+	await ctx.defer()
 	is_battery()
 	if check_battery.is_running() is True:
 		check_battery.cancel()
-		bot.change_presence(activity=None)
+		await bot.change_presence(activity=None)
 		await ctx.send("Checking battery stopped")
 	else:
 		await ctx.send("Already stopped")
 
 @bot.hybrid_command(name="start_checking_battery", description="Starts check_battery task", check=is_battery)
 async def start_chk_btr(ctx):
-	ctx.defer()
+	await ctx.defer()
 	is_battery()
 	if check_battery.is_running() is False:
 		check_battery.start()

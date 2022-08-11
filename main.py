@@ -94,7 +94,7 @@ async def chk_btr(ctx):
 	ctx.defer()
 	is_battery()
 	battery = json.loads(os.popen("termux-battery-status").read())
-	details = f"""Battery status: {battery.get('status').lower}
+	details = f"""Battery status: {battery.get('status').lower()}
 Charge: {battery.get('percentage')}%
 Temperature: {round(battery.get('temperature'))}°C"""
 	await ctx.send(details)

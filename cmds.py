@@ -1,4 +1,4 @@
-import os, json
+import os, sys, json
 import discord
 from discord.ext import commands, tasks
 
@@ -11,9 +11,10 @@ class Quit:
 	#	self.ctx = ctx
 		
 	class View(discord.ui.View):
-		def __init__(self, user):
-			super().__init__(timeout=1)
+		def __init__(self, user, type):
+			super().__init__()
 			self.user = user
+			self.type = type
 	
 		async def interaction_check(self, interaction):
 			if interaction.type is discord.InteractionType.component:
@@ -26,9 +27,14 @@ class Quit:
 			for child in self.children:
 				child.disabled = True
 			button.label = '> '+button.label+' <'
-			await interaction.response.edit_message(content="Nanobuttons, son\nThey disables response on clicked by user\nYou can't kick me, Jack", view=self)
-			self.stop()
-			# await interaction.guild.leave()
+			if self.type == "QUIT":
+				await interaction.response.edit_message(content="Nanobuttons, son\nThey disables response on clicked by user\nYou can't kick me, Jack", view=self)
+				self.stop()
+				# await interaction.guild.leave()
+			elif self.type == "EXIT":
+				await interaction.response.edit_message(content="Shutting down...", view=self)
+				self.stop()
+				sys.exit()
 
 		@discord.ui.button(style=discord.ButtonStyle.grey, label="Cancel")
 		async def cancel(self, interaction, button):
@@ -41,7 +47,14 @@ class Quit:
 	@commands.command(name="quit", description="Kick bot from this guild")
 	async def quit(ctx, *args):
 		if ctx.permissions.administrator:
-			await ctx.send("Are you sure want to kick me?", view=Quit.View(ctx.author))
+			await ctx.send("Are you sure want to Kick me?", view=Quit.View(ctx.author, "QUIT"))
+		else:
+			raise commands.CommandError("Error: User permissions")
+			
+	@commands.command(name="exit", description="Stop bot")
+	async def exit(ctx, *args):
+		if ctx.author.id == 400989403482423296:
+			await ctx.send("Are you sure want to Stop me?", view=Quit.View(ctx.author, "EXIT"))
 		else:
 			raise commands.CommandError("Error: User permissions")
 			

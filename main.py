@@ -14,8 +14,8 @@ class Bot(commands.Bot):
 	def __init__(self):
 		super().__init__(command_prefix=commands.when_mentioned_or(">_"), strip_after_prefix=True, intents=discord.Intents.all())
 
-	#async def on_command_error(self, ctx, exception):
-	#	await ctx.send(exception)
+	async def on_command_error(self, ctx, exception):
+		await ctx.send(exception)
 
 bot = Bot()
 
@@ -41,6 +41,7 @@ tictactoe = cmds.TicTacToe()
 battery = cmds.Battery()
 
 bot.add_command(quit.quit)
+bot.add_command(quit.exit)
 bot.add_command(tictactoe.ttt)
 bot.add_command(battery.battery)
 

@@ -4,4 +4,4 @@ from abc import ABC
 
 class Config(ABC):
     CMD_PREFIX = when_mentioned_or(">_", "!")
-    INTENTS = Intents.default()
+    INTENTS = Intents.all()

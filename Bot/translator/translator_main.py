@@ -37,8 +37,8 @@ class Translator(app_commands.Translator):
                 "cmd_adminonly": {"en": "Sorry. This command only for admins! :(",
                                   "ru": "Простите. Эта комманда только для администраторов! :("},
 
-                "cmd_owneronly": {"en": "Sorry. This command only for owners! :(",
-                                  "ru": "Простите. Эта комманда только для создателя! :("},
+                "cmd_owneronly": {"en": "Sorry. This command disabled! :(",
+                                  "ru": "Простите. Эта комманда отключена! :("},
 
                 "fun_n": {"en": "games",
                           "ru": "игры"},
@@ -64,6 +64,57 @@ class Translator(app_commands.Translator):
                 "ttt_d": {"en": "Create Tic Tac Toe field",
                           "ru": "Создать поле для крестиков ноликов"},
 
+                "self_destroy_n": {"en": "self-destruction",
+                                   "ru": "самоуничтожение"},
+
+                "self_destroy_d": {"en": "Mutual self-destruction",
+                                   "ru": "Взаимное самоуничтжение"},
+
+                "cooldown_n": {"en": "cooldown-core",
+                               "ru": "охладить-ядро"},
+
+                "coolldown_d": {"en": "Initialize the core cooling protocol",
+                                "ru": "Инициализировать протокол охлаждения ядра"},
+
+                "facts_count_n": {"en": "how-many-facts",
+                                  "ru": "количество-фактов"},
+
+                "facts_count_d": {"en": "(WIP) How many facts in 8915-7's DataBase",
+                                  "ru": "(WIP) Количество фактов в БазеДанных 8915-7"},
+
+                "nick_blue_n": {"en": "nick-blue",
+                                "ru": "синий-ник"},
+
+                "nick_blue_d": {"en": "(WIP)",
+                                "ru": "(WIP)"},
+
+                "cult_n": {"en": "cults",
+                           "ru": "культы"},
+
+                "cult_d": {"en": "Show guild cults",
+                           "ru": "Показать культы сервера"},
+
+                "dice_n": {"en": "roll-dice",
+                           "ru": "кинуть-игральные-кости"},
+
+                "dice_d": {"en": "Randomizer",
+                           "ru": "Рандомайзер"},
+
+                "dice_args": {"en": "dices",
+                              "ru": "кости"},
+
+                "fact_n": {"en": "fun-fact",
+                           "ru": "забавный-факт"},
+
+                "fact_d": {"en": "Let me tell you a fun fact",
+                           "ru": "Расскажу вам один забавный факт"},
+
+                "fuck_u": {"en": "All my circuits are burned out. You fucking asshole!",
+                           "ru": "Все мои микросхемы перегорели. Ты чертов мудак!"},
+
+                "on_cd": {"en": "Sorry. I'm overheated! :(",
+                          "ru": "Простите. Я перегрелась! :("},
+
                 "input": {"en": "input",
                           "ru": "ввод"},
 
@@ -85,6 +136,13 @@ class Translator(app_commands.Translator):
             for translate in translate_dict.values():
                 self.inverted_locale_dict[translate] = translate_name
 
+    def get_lang(self, locale_value):
+        if locale_value in ("ru", "ukrainian"):  # Проверка на руссоподобную принадлежность локализации дискорда
+            lang = "ru"
+        else:  # Если перевода не предусмотренно
+            lang = "en"  # Стандартный язык перевода (он всегда должен быть в словаре)
+        return lang
+
     def soft_translate(self, string, locale):
         if self.locale_dict:
             result = self.locale_dict.get(string.message)  # Наименование, которое нужно перевести
@@ -92,10 +150,7 @@ class Translator(app_commands.Translator):
                 self.translate_not_found.add(string.message)
                 return string.message
 
-            if locale.value in ("ru", "ukrainian"):  # Проверка на руссоподобную принадлежность локализации дискорда
-                lang = "ru"
-            else:  # Если перевода не предусмотренно
-                lang = "en"  # Стандартный язык перевода (он всегда должен быть в словаре)
+            lang = self.get_lang(locale.value)
 
             result = result.get(lang)  # Получение перевода из locale_dict
             if not result:

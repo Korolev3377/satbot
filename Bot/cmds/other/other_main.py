@@ -101,8 +101,8 @@ class Other:
         @BOT.tree.command(name="fact_n", description="fact_d")
         async def cmd(interaction: discord.Interaction):
             await interaction.response.defer()
-            if lang := _T.get_lang(interaction.locale.value):
-                if fact := await _F.read_facts(guild=interaction.guild, lang=lang):
-                    await interaction.followup.send(fact)
+            if fact := await _F.read_facts(guild=interaction.guild, lang=lang):
+                await interaction.followup.send(fact)
             else:
                 await interaction.followup.send(_T.soft_translate(_ls("no_facts"), locale=interaction.locale))
+

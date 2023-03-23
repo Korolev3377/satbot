@@ -3,9 +3,9 @@ import asyncio
 import discord
 from discord import app_commands
 
-from .games.gol import GameOfLife
+from .games.gol_game import GameOfLife
 from discord.app_commands import locale_str as _ls
-from Bot.translator import Translator
+from translator.main import T
 
 locale = {"start": {"en": "Start",
                     "ru": "Запустить"},
@@ -19,28 +19,57 @@ locale = {"start": {"en": "Start",
               "ru": "Выйти"}
           }
 
-_T = Translator(locale_dict=locale)
+_T = T(locale_dict=locale)
 
-@app_commands.command(name="gol_n", description="gol_d", extras={"usage": "gol_doc"})
+gol_lc = {
+    'gol_name': {
+        'en': 'game-of-live',
+        'ru': 'игра-в-жизнь'
+    },
+    "gol_desc": {
+        'en': 'Emulate game of live field.',
+        'ru': 'Эмулирует поле игры в жизнь.'
+    }
+}
+
+
+@app_commands.command(
+    name=_ls(
+        'gol_name',
+        extras={
+            'dict': gol_lc.get('gol_name'),
+            'type': 'cmd'
+        }
+    ),
+    description=_ls(
+        'gol_desc',
+        extras={
+            'dict': gol_lc.get('gol_desc'),
+            'type': 'cmd'
+        }
+    ),
+    extras={
+        "usage": "gol_doc"
+    }
+)
 async def gol_cmd(interaction: discord.Interaction, size: app_commands.Range[int, 3, 28] = 5):
     await interaction.response.defer()
-    lang = interaction.locale
-    GOL = GameOfLife()
+    _T.set_locale(interaction.locale)
+    gol = GameOfLife()
     if 3 <= size <= 13:
-        view = GameOfLifeView(interaction.user, GOL, size, lang=lang)
+        view = GameOfLifeView(interaction.user, gol, size)
     elif 14 <= size <= 28:
-        view = GameOfLifeView(interaction.user, GOL, size, binary=True, lang=lang)
+        view = GameOfLifeView(interaction.user, gol, size, binary=True)
     else:
-        view = GameOfLifeView(interaction.user, GOL, 5, langlang)
+        view = GameOfLifeView(interaction.user, gol, 5, langlang)
     await interaction.followup.send(content=view.render(), view=view)
 
 
 class GameOfLifeView(discord.ui.View):
     runing = False
 
-    def __init__(self, author, gol, size, lang, binary=False):
+    def __init__(self, author, gol, size, binary=False):
         super().__init__()
-        self.lang = lang
         self.binary = binary
         self.field = gol.Field(size=size)
         self.user = author
@@ -61,7 +90,7 @@ class GameOfLifeView(discord.ui.View):
             ]
         for y, layer in enumerate(button_layers):
             for button_type in layer:
-                self.add_item(self.GolControlButton(button_type=button_type, row=y, lang=self.lang))
+                self.add_item(self.GolControlButton(button_type=button_type, row=y))
 
     def render(self):
         field = self.field.print_field()
@@ -119,7 +148,7 @@ class GameOfLifeView(discord.ui.View):
         return "".join(rendered_field)
 
     class GolControlButton(discord.ui.Button):
-        def __init__(self, lang, button_type=None, row=0):
+        def __init__(self, button_type=None, row=0):
             # Cursor move
             if button_type == "8":
                 super().__init__(emoji="⬆️", row=row, custom_id=button_type)
@@ -152,9 +181,14 @@ class GameOfLifeView(discord.ui.View):
 
             # Control
             elif button_type == "Q":
-                super().__init__(style=discord.ButtonStyle.red, label=_T.soft_translate(_ls("exit"), locale=lang), row=row, custom_id=button_type)
+                super().__init__(style=discord.ButtonStyle.red,
+                                 label=_T.stranslate(_ls("exit")),
+                                 row=row,
+                                 custom_id=button_type)
             elif button_type == "S-E":
-                super().__init__(style=discord.ButtonStyle.green, label=_T.soft_translate(_ls("start"), locale=lang), row=row,
+                super().__init__(style=discord.ButtonStyle.green,
+                                 label=_T.stranslate(_ls("start")),
+                                 row=row,
                                  custom_id=button_type)
             else:
                 super().__init__(label="_", disabled=True, row=row)
@@ -200,10 +234,10 @@ class GameOfLifeView(discord.ui.View):
             elif self.custom_id == "S-E":
                 if view.runing:
                     view.runing = False
-                    self.label = (_T.soft_translate(_ls("start"), locale=view.lang), _T.soft_translate(_ls("stop"), locale=view.lang))[view.runing]
+                    self.label = (_T.stranslate(_ls("start")), _T.stranslate(_ls("stop")))[view.runing]
                 else:
                     view.runing = True
-                    self.label = (_T.soft_translate(_ls("start"), locale=view.lang), _T.soft_translate(_ls("stop"), locale=view.lang))[view.runing]
+                    self.label = (_T.stranslate(_ls("start")), _T.stranslate(_ls("stop")))[view.runing]
                     for child in view.children:
                         if child.custom_id in ("Q", "S-E"):
                             child.disabled = False

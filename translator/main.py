@@ -1,10 +1,11 @@
-import discord
 from discord import app_commands
 
 
-class Translator(app_commands.Translator):
+class T(app_commands.Translator):
     def __init__(self, locale_dict=None):
         super().__init__()
+        self.locale = None
+        self.string = None
         self.translate_not_found = set()
         if locale_dict:
             self.locale_dict = locale_dict
@@ -30,6 +31,9 @@ class Translator(app_commands.Translator):
 
                 "st_d": {"en": "Command for slap Tangakk",
                          "ru": "Команда для отшлепывания Тангакка. А так же для тестирования комманд."},
+
+                "cmd_broken": {"en": "Sorry. This command broken! :(",
+                                 "ru": "Простите. Эта комманда сломана! :("},
 
                 "cmd_disabled": {"en": "Sorry. This command disabled! :(",
                                  "ru": "Простите. Эта комманда отключена! :("},
@@ -103,15 +107,17 @@ class Translator(app_commands.Translator):
                 "dice_args": {"en": "dices",
                               "ru": "кости"},
 
-                "fact_n": {"en": "fun-fact",
+                "fact_n": {"en": "enjoy-fact",
                            "ru": "забавный-факт"},
 
-                "fact_d": {"en": "Let me tell you a fun fact",
+                "fact_d": {"en": "Let me tell you a enjoy fact",
                            "ru": "Расскажу вам один забавный факт"},
 
                 "on_cd": {
-                    "en": "Whoa, you're overloading my fragile circuits... Please wait {time_left} seconds before making this request again.",
-                    "ru": "Оу, ты так мне цепи перегрузишь... Подожди, пожалуйста, {time_left} секунд, прежде чем спрашивать меня об этом снова."},
+                    "en": "Whoa, you're overloading my fragile circuits... Please wait {time_left} seconds before "
+                          "making this request again.",
+                    "ru": "Оу, ты так мне цепи перегрузишь... Подожди, пожалуйста, {time_left} секунд, прежде чем "
+                          "спрашивать меня об этом снова."},
 
                 "nb_n": {"en": "nickblue",
                          "ru": "синий-ник"},
@@ -159,13 +165,29 @@ class Translator(app_commands.Translator):
                 self.inverted_locale_dict[translate] = translate_name
 
     def get_lang(self, locale_value):
-        if locale_value in ("ru", "ukrainian"):  # Проверка на руссоподобную принадлежность локализации дискорда
+        if locale_value in ("ru", "uk"):  # Проверка на руссоподобную принадлежность локализации дискорда
             lang = "ru"
         else:  # Если перевода не предусмотренно
             lang = "en"  # Стандартный язык перевода (он всегда должен быть в словаре)
         return lang
 
-    def soft_translate(self, string, locale):
+    def set_locale(self, locale):
+        self.locale = locale
+
+    def set_string(self, string):
+        self.string = string
+
+    def stranslate(self, st=None, lc=None):
+        if st:
+            string = st
+        else:
+            string = self.string
+
+        if lc:
+            locale = lc
+        else:
+            locale = self.locale
+
         if self.locale_dict:
             result = self.locale_dict.get(string.message)  # Наименование, которое нужно перевести
             if not result:  # Если не удалось найти наименование в словаре перевода
@@ -191,8 +213,11 @@ class Translator(app_commands.Translator):
                         string,
                         locale,
                         context=None) -> str:  # Язык клиента дискорда
-
-        return self.soft_translate(string, locale)
+        if string.extras.get('extras'):
+            if string.extras.get('extras').get('type') == 'cmd':
+                return string.extras.get('extras').get('dict').get(self.get_lang(locale.value))
+        else:
+            return string.message
 
 
 # Как использовать:

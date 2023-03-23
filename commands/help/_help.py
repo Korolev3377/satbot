@@ -1,9 +1,8 @@
 import discord
 from discord import app_commands
-from discord.ext import commands
 
 from discord.app_commands import locale_str as _ls
-from Bot.translator import Translator as T
+from _translator import T as T
 
 locale = {"sc": {"en": "**Subcommands:**",
                  "ru": "**Подкомманды:**"},
@@ -21,7 +20,7 @@ locale = {"sc": {"en": "**Subcommands:**",
                       "ru": "Комманда \"{cmd}\":"}
           }
 
-_T = T(locale_dict=locale)
+_T = Tra(locale_dict=locale)
 
 doc = {"help_doc": {"en": "**Usage:** help <command>",
                     "ru": "**Использование:** помощь <комманда>"},
@@ -75,7 +74,7 @@ Red button - Остановить игру
 Активность - это значение, которое определяет, будет ли клетка жить или умрет в следующий ход.
 Когда клетка создает активность, эта активность подсчитывается соседними клетками. Клетка не считает свою активность."""}}
 
-_docT = T(locale_dict=doc)
+_docT = Tra(locale_dict=doc)
 
 
 class Help:
@@ -83,9 +82,9 @@ class Help:
         def signatures(cmd_list, lang):
             to_return = []
             for cmd in cmd_list:
-                to_return.append("%s - %s" % (BOT.tree.translator.soft_translate(string=_ls(cmd.name), locale=lang),
-                                              BOT.tree.translator.soft_translate(string=_ls(cmd.description),
-                                                                                 locale=lang) or _ls("...")))
+                to_return.append("%s - %s" % (BOT.tree.translator.stranslate(string=_ls(cmd.name), locale=lang),
+                                              BOT.tree.translator.stranslate(string=_ls(cmd.description),
+                                                                             locale=lang) or _ls("...")))
             return "\n".join(to_return)
 
         def get_commands(group, cmd_name):
@@ -109,7 +108,7 @@ class Help:
                 return None
 
         def get_help(cmd, lang):
-            desc = BOT.tree.translator.soft_translate(string=_ls(cmd.description), locale=lang)
+            desc = BOT.tree.translator.stranslate(string=_ls(cmd.description), locale=lang)
             if type(cmd) is app_commands.Group:
                 parents = signatures([cmd for cmd in cmd.commands if not cmd.extras.get("hidden")], lang)
             else:
@@ -118,7 +117,7 @@ class Help:
             if desc:
                 help_doc.append(desc)
             if parents:
-                help_doc.append(f"\n{_T.soft_translate(string=_ls('sc'), locale=lang)}\n" + parents)
+                help_doc.append(f"\n{_T.stranslate(string=_ls('sc'), locale=lang)}\n" + parents)
             return "\n".join(help_doc)
 
         @BOT.tree.command(name="help_n",
@@ -128,9 +127,9 @@ class Help:
 
             lang = interaction.locale
 
-            embed = discord.Embed(title=_T.soft_translate(string=_ls("help"), locale=lang))
+            embed = discord.Embed(title=_T.stranslate(string=_ls("help"), locale=lang))
             if not command:
-                embed.add_field(name=_T.soft_translate(string=_ls("ac"), locale=lang),
+                embed.add_field(name=_T.stranslate(string=_ls("ac"), locale=lang),
                                 value=signatures(BOT.tree.get_commands(), lang) or None,
                                 inline=False)
                 await interaction.followup.send(embed=embed, ephemeral=True)
@@ -140,19 +139,19 @@ class Help:
                     sub = get_commands(sub, arg)
                     if not sub:
                         await interaction.followup.send(
-                            _T.soft_translate(string=_ls("cmd_notfound", extras={"format": {"cmd": arg}}), locale=lang))
+                            _T.stranslate(string=_ls("cmd_notfound", extras={"format": {"cmd": arg}}), locale=lang))
                         return
                 cmd_name = []
                 for q_name in sub.qualified_name.split():
-                    cmd_name.append(BOT.tree.translator.soft_translate(string=_ls(q_name), locale=lang))
+                    cmd_name.append(BOT.tree.translator.stranslate(string=_ls(q_name), locale=lang))
                 cmd_name = " ".join(cmd_name)
                 embed.add_field(
-                    name=_T.soft_translate(string=_ls("cmd_sig", extras={"format": {"cmd": cmd_name}}), locale=lang),
+                    name=_T.stranslate(string=_ls("cmd_sig", extras={"format": {"cmd": cmd_name}}), locale=lang),
                     value=get_help(sub, lang),
                     inline=False)
                 await interaction.followup.send(embed=embed, ephemeral=True)
                 if usage := sub.extras.get("usage"):
-                    await interaction.followup.send(_docT.soft_translate(string=_ls(usage), locale=lang),
+                    await interaction.followup.send(_docT.stranslate(string=_ls(usage), locale=lang),
                                                     ephemeral=True)
 
                 # if doc := sub.help:

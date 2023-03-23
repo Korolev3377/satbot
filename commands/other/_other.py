@@ -2,11 +2,10 @@ import discord
 import re
 import random
 import collections as coll
-import os
 
-from Bot.misc import Facts
+from environment import Facts
 from discord.app_commands import locale_str as _ls
-from Bot.translator import Translator as T
+from _translator import T as T
 
 locale = {"too_many_dices": {"en": "Too many dices. Maximum - 10",
                              "ru": "Слишком много игральных костей. Максимум - 10"},
@@ -19,7 +18,7 @@ locale = {"too_many_dices": {"en": "Too many dices. Maximum - 10",
           "no_facts": {"en": "Sorry. I don't have any facts yet! :(",
                        "ru": "Простите. У меня пока-что нету фактов! :("}}
 
-_T = T(locale_dict=locale)
+_T = Tra(locale_dict=locale)
 _F = Facts()
 
 def capitalize_words(string):
@@ -46,15 +45,15 @@ class Other:
             cults_tuple = list(dict(coll.Counter(clist).most_common(10)).items())
             if len(cults_tuple) > 0:
                 embed = discord.Embed(
-                    title=_T.soft_translate(_ls("top_c"), locale=lang))
+                    title=_T.stranslate(_ls("top_c"), locale=lang))
                 for i, cult in enumerate(cults_tuple):
                     cult_name, members_count = cult
                     if members_count > 1:
                         embed.add_field(name=f"{i + 1}) {capitalize_words(cult_name)}",
-                                        value=_T.soft_translate(_ls("mem",
-                                                                    extras={
+                                        value=_T.stranslate(_ls("mem",
+                                                                extras={
                                                                         "format": {"members_count": members_count}}),
-                                                                locale=lang),
+                                                            locale=lang),
                                         inline=False)
                 await interaction.followup.send(embed=embed)
 
@@ -65,7 +64,7 @@ class Other:
             results = {}
             dices = re.findall(r'\d*[dк-]\d+', dice_args)
             if len(dices) > 10:
-                await interaction.followup.send(_T.soft_translate(_ls("too_many_dices"), locale=lang))
+                await interaction.followup.send(_T.stranslate(_ls("too_many_dices"), locale=lang))
                 return
             for dice in dices:
                 count, value = re.split(r'[dк-]', dice)
@@ -94,15 +93,16 @@ class Other:
             if len(results.items()) > 1:
                 tosay += f'{gsum}'
             if tosay == '':
-                await interaction.followup.send(_T.soft_translate(_ls("noting_tosay"), locale=lang))
+                await interaction.followup.send(_T.stranslate(_ls("noting_tosay"), locale=lang))
                 return
             await interaction.followup.send(tosay)
 
         @BOT.tree.command(name="fact_n", description="fact_d")
         async def cmd(interaction: discord.Interaction):
             await interaction.response.defer()
+            lang = interaction.locale
             if fact := await _F.read_facts(guild=interaction.guild, lang=lang):
                 await interaction.followup.send(fact)
             else:
-                await interaction.followup.send(_T.soft_translate(_ls("no_facts"), locale=interaction.locale))
+                await interaction.followup.send(_T.stranslate(_ls("no_facts"), locale=interaction.locale))
 

@@ -1,4 +1,5 @@
 from discord import app_commands
+from environment.variable import *
 
 
 class T(app_commands.Translator):
@@ -33,7 +34,7 @@ class T(app_commands.Translator):
                          "ru": "Команда для отшлепывания Тангакка. А так же для тестирования комманд."},
 
                 "cmd_broken": {"en": "Sorry. This command broken! :(",
-                                 "ru": "Простите. Эта комманда сломана! :("},
+                               "ru": "Простите. Эта комманда сломана! :("},
 
                 "cmd_disabled": {"en": "Sorry. This command disabled! :(",
                                  "ru": "Простите. Эта комманда отключена! :("},
@@ -201,7 +202,7 @@ class T(app_commands.Translator):
                 return string.message
 
             if string.extras:  # Проверка format (значение, которое нужно вставить в текст)
-                if format_dict := string.extras["extras"].get("format"):
+                if format_dict := string.extras[EXTRAS].get(FORMAT):
                     result = result.format(**format_dict)
 
             return result
@@ -213,9 +214,9 @@ class T(app_commands.Translator):
                         string,
                         locale,
                         context=None) -> str:  # Язык клиента дискорда
-        if string.extras.get('extras'):
-            if string.extras.get('extras').get('type') == 'cmd':
-                return string.extras.get('extras').get('dict').get(self.get_lang(locale.value))
+        if string.extras.get(EXTRAS):
+            if string.extras.get(EXTRAS).get(TYPE) == CMD:
+                return string.extras.get(EXTRAS).get(DICT).get(self.get_lang(locale.value))
         else:
             return string.message
 

@@ -4,6 +4,7 @@ from discord.app_commands import locale_str as _ls
 
 from commands.main import declare_cmds
 from environment.main import Env, Cfg, Facts
+from environment.variable import *
 from heart.heart import Heart
 from translator.main import T
 
@@ -36,19 +37,26 @@ if __name__ == '__main__':
         _user = interaction.user.id
 
         # Системные комманды могут вызываться без последствий
-        if interaction.command.extras.get('system'):
+        if interaction.command.extras.get(IS_SYSTEM):
             if BOT.antispam.get(_user):
-                if BOT.antispam.get(_user).get('overload') > 100.0:
-                    BOT.antispam[_user]['overloaded'] = True
+                if BOT.antispam.get(_user).get(USER_LOAD) > 100.0:
+                    BOT.antispam[_user][IS_USER_OVERLOADED] = True
             return True
 
         # Проверка на перегрузку
         if BOT.antispam.get(_user):
-            if BOT.antispam.get(_user).get('overloaded'):
+            if BOT.antispam.get(_user).get(IS_USER_OVERLOADED):
                 _T.set_string(
-                    _ls("on_cd",
-                        extras={"format":
-                            {"time_left": int(BOT.heart.time_to_cooldown(BOT.antispam.get(_user).get('overload')))}
+                    _ls(
+                        "on_cd",
+                        extras={
+                            FORMAT: {
+                                "_": int(
+                                    BOT.heart.time_to_cooldown(
+                                        BOT.antispam.get(_user).get(USER_LOAD)
+                                    )
+                                )
+                            }
                         }
                     )
                 )
@@ -56,7 +64,7 @@ if __name__ == '__main__':
                 return False
 
         # Проверка на отключенную комманду
-        if interaction.command.extras.get("disabled"):
+        if interaction.command.extras.get(IS_DISABLED):
             _T.set_string(
                 _ls("cmd_disabled")
             )
@@ -64,7 +72,7 @@ if __name__ == '__main__':
             return False
 
         # Предупреждение, что эта комманда сломана.
-        if interaction.command.extras.get("broken"):
+        if interaction.command.extras.get(IS_BROKEN):
             _T.set_string(
                 _ls("cmd_broken")
             )
@@ -72,7 +80,7 @@ if __name__ == '__main__':
             return False
 
         # Проверка на администратора сервера
-        if not interaction.permissions.administrator and interaction.command.extras.get("admin_only"):
+        if not interaction.permissions.administrator and interaction.command.extras.get(IS_ADMIN_ONLY):
             if not await BOT.is_owner(interaction.user):
                 _T.set_string(
                     _ls("cmd_adminonly")
@@ -81,7 +89,7 @@ if __name__ == '__main__':
                 return False
 
         # Проверка на создателя бота
-        if not await BOT.is_owner(interaction.user) and interaction.command.extras.get("owner_only"):
+        if not await BOT.is_owner(interaction.user) and interaction.command.extras.get(IS_OWNER_ONLY):
             _T.set_string(
                 _ls("cmd_owneronly")
             )
@@ -90,12 +98,12 @@ if __name__ == '__main__':
 
         if not BOT.antispam.get(_user):
             BOT.antispam[_user] = {
-                'overload': 0,
-                'overloaded': False
+                USER_LOAD: 0,
+                IS_USER_OVERLOADED: False
             }
-        BOT.antispam[_user]['overload'] += BOT.antispam[_user]['overload']+20
-        if BOT.antispam.get(_user).get('overload') > 100.0:
-            BOT.antispam[_user]['overloaded'] = True
+        BOT.antispam[_user][USER_LOAD] += BOT.antispam[_user][USER_LOAD] + 20
+        if BOT.antispam.get(_user).get(USER_LOAD) > 100.0:
+            BOT.antispam[_user][IS_USER_OVERLOADED] = True
         return True
 
 

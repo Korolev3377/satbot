@@ -9,7 +9,7 @@ from .bf_cmd import bf_cmd
 from .ttt_cmd import ttt_cmd
 from .gol_cmd import gol_cmd
 
-ENJOY_GROUP_NAME = "engoygrp_name"
+ENJOY_GROUP_NAME = "enjoygrp_name"
 ENJOY_GROUP_DESC = "enjoygrp_desc"
 
 _locale = {ENJOY_GROUP_NAME: {EN: "game",

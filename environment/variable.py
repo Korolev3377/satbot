@@ -23,6 +23,17 @@ IS_BROKEN = "broken"
 IS_ADMIN_ONLY = "admin_only"
 IS_OWNER_ONLY = "owner_only"
 
+ID = "id"
+NAME = "name"
+WEALTH = "wealth"
+SCORE = "score"
+LANGUAGE = "language"
+USERS = "users"
+
+ADD = "add"
+SET = "set"
+TRANSFER = "move"
+
 # Замочег для базы данных.
 LOCK = asyncio.Lock()
 

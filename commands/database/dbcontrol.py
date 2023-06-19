@@ -1,7 +1,7 @@
 import sqlite3 as sql
 from environment.variable import *
 
-from discord import SelectOption
+from discord.app_commands import Choice
 
 
 class DataBase:
@@ -19,14 +19,25 @@ class DataBase:
                         SELECT {NAME}, {ID}
                         FROM {USERS};""")
         i = self.db_cursor.fetchall()
+        dat = []
         if i:
-            self.users = [SelectOption(label=i[0], value=i[1]) in i]
+            for _ in i:
+                dat.append(Choice(name=str(_[0]), value=str(_[1])))
+            self.users = dat
         else:
             self.users = None
 
     def disconnect(self):
         self.db_connection.commit()
         self.db_connection.close()
+
+    async def reload(self, bot):
+        self.connect()
+        self.disconnect()
+        bot.tree.clear_commands(guild=None)
+        await bot.tree.sync()
+        bot.Declare_Cmds(bot)
+        await bot.tree.sync()
 
     def get_user_info(self, user_id: int, user_name: str, user_language: str):
         self.db_cursor.execute(f"""

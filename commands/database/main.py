@@ -107,37 +107,24 @@ async def balancecmd(interaction: discord.Interaction):
                     }
                 )
             )
+        await DB.reload(interaction.client)
         await interaction.followup.send(_T.stranslate())
-
-
-class TransferView(discord.ui.View):
-    def __init__(self, author, gol, size, binary=False):
-        super().__init__()
-        self.add_item(discord.ui.TextInput(label="Введите сумму", placeholder="Число от 1 до 1000"))
-        self.add_item(discord.ui.Select(placeholder="Кому перевести", options=DB.users))
-        self.add_item(discord.ui.Button(label="Перевести"))
-        self.add_item(discord.ui.Button(label="Отмена", style=discord.ButtonStyle.red))
-
-"""
-@app_commands.rename(value=namedesc(VALUE, _locale))
-@app_commands.rename(target_userid=namedesc(TARGET, _locale))
-@app_commands.choices(target_userid=DB.users)
-"""
 
 
 @wealthgrp.command(
     name=namedesc(TRANSFER_NAME, _locale),
     description=namedesc(TRANSFER_DESC, _locale)
 )
-async def trasfercmd(interaction: discord.Interaction):
+@app_commands.rename(target_user="кому", value="сколько")
+@app_commands.choices(target_user=DB.users)
+async def trasfercmd(interaction: discord.Interaction, target_user: Choice[str], value: app_commands.Range[int, 1, 1000]):
     await interaction.response.defer(thinking=True)
     _T.set_locale(locale=interaction.locale)
-    view = TransferView()
     while LOCK.locked():
         await asyncio.sleep(1)
     async with LOCK:
         try:
-            target_userid = int(target_userid.value)
+            target_userid = int(target_user.value)
         except:
             _T.set_string(
                 string=_ls(
@@ -197,30 +184,4 @@ async def trasfercmd(interaction: discord.Interaction):
                     TRANSFER_ERROR
                 )
             )
-        await interaction.followup.send(_T.stranslate())
-
-
-@wealthgrp.command(
-    name="testln",
-    description="testld"
-)
-@app_commands.rename(arg="аргумет")
-@app_commands.choices(arg=DB.users)
-async def forcetfrcmd(interaction: discord.Interaction, arg: Choice[str]):
-    """Test command
-    :param interaction:
-    Interaction param
-    :param arg:
-    Test Argument
-    """
-    await interaction.response.defer(thinking=True)
-    _T.set_locale(locale=interaction.locale)
-    while LOCK.locked():
-        await asyncio.sleep(1)
-    async with LOCK:
-        _T.set_string(
-            string=_ls(
-                arg.value
-            )
-        )
         await interaction.followup.send(_T.stranslate())

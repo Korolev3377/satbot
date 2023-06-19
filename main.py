@@ -24,6 +24,8 @@ if __name__ == '__main__':
             # Это главный цикл бота. В нем идет пассивное уменьшение КД и проверка на то,
             # когда нужно будет менять Синего ника. Если вообще нужно будет.
 
+            self.Declare_Cmds = declare_cmds
+
         async def setup_hook(self):
             self.tree.interaction_check = itr_check
             await self.tree.set_translator(T())  # Установка переводчика
@@ -161,5 +163,5 @@ if __name__ == '__main__':
     async def on_member_remove(member: discord.Member):
         await member.guild.system_channel.send("{user} left this Guild".format(user=member.mention))
 
-    declare_cmds(BOT)
+    BOT.Declare_Cmds(BOT)
     BOT.run(TOKEN)

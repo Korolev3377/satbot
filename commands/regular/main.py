@@ -81,7 +81,7 @@ _T = T(locale_dict=_locale)
 )
 async def facts(interaction: discord.Interaction):
     await interaction.response.defer()
-    _T.set_locale(interaction.locale)
+    _T.set_language(interaction.locale)
     if fact := await _F.read_facts(guild=interaction.guild, lang=_T.get_lang(interaction.locale.value)):
         await interaction.followup.send(fact)
     else:
@@ -98,7 +98,7 @@ async def facts(interaction: discord.Interaction):
     app_commands.Choice(name=namedesc("by_wealth", _locale), value=1)])
 async def cults(interaction: discord.Interaction, sort_by: app_commands.Choice[int] = 0):
     await interaction.response.defer()
-    _T.set_locale(interaction.locale)
+    _T.set_language(interaction.locale)
     sort_by = sort_by.value
     clist = {}
     cmoney = {}
@@ -181,7 +181,7 @@ async def cults(interaction: discord.Interaction, sort_by: app_commands.Choice[i
 )
 async def rolldice(interaction: discord.Interaction, *, dice_args: str):
     await interaction.response.defer()
-    _T.set_locale(interaction.locale)
+    _T.set_language(interaction.locale)
     results = {}
     dices = re.findall(r'\d*[dк-]\d+', dice_args)
     if len(dices) > 10:

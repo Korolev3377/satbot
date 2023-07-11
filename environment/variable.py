@@ -29,7 +29,7 @@ NAME = "name"
 WEALTH = "wealth"
 SCORE = "score"
 LANGUAGE = "language"
-USERS = "users"
+IS_VISIBLE = "is_visible"
 
 ADD = "add"
 SET = "set"
@@ -66,9 +66,3 @@ def namedesc(name_desc, locale_dict):
             TYPE: CMD
         }
     )
-
-
-class ConfirmButton(discord.ui.Button):
-    def __init__(self):
-        super().__init__()
-        ...

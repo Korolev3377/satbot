@@ -1,7 +1,9 @@
 import sqlite3 as sql
-from environment.variable import *
+from typing import Any, Union
 
 from discord.app_commands import Choice
+
+from environment.variable import *
 
 
 class DataBase:
@@ -17,7 +19,7 @@ class DataBase:
         self.db_cursor = self.db_connection.cursor()
         self.db_cursor.execute(f"""
         SELECT {NAME}, {ID}
-        FROM {USERS}
+        FROM users
         WHERE is_visible = 1;""")
         i = self.db_cursor.fetchall()
         dat = []
@@ -35,13 +37,13 @@ class DataBase:
     def get_user_info(self, user_id: int, user_name: str, user_language: str, create_usr=True):
         self.db_cursor.execute(f"""
         SELECT {ID}, {NAME}, {WEALTH}, {SCORE}, {LANGUAGE}
-        FROM {USERS}
+        FROM users
         WHERE id = {user_id};""")
         i = self.db_cursor.fetchone()
         if i:
             data = {ID: i[0], NAME: i[1], WEALTH: i[2], SCORE: i[3], LANGUAGE: i[4]}
             self.db_cursor.execute(f"""
-            UPDATE {USERS} SET
+            UPDATE users SET
             name = "{user_name}"
             WHERE id = {data.get(ID)};""")
             return data.get(WEALTH)
@@ -57,13 +59,13 @@ class DataBase:
         if mode == ADD:
             self.db_cursor.execute(f"""
             SELECT {ID}, {NAME}, {WEALTH}, {SCORE}, {LANGUAGE}
-            FROM {USERS}
+            FROM users
             WHERE id = {users[0]};""")
             i = self.db_cursor.fetchone()
             if i:
                 data = {ID: i[0], NAME: i[1], WEALTH: i[2] + value, SCORE: i[3], LANGUAGE: i[4]}
                 self.db_cursor.execute(f"""
-                UPDATE {USERS} SET
+                UPDATE users SET
                 wealth = {data.get(WEALTH)}
                 WHERE id = {data.get(ID)};""")
                 return "added", data.get(WEALTH)
@@ -119,6 +121,53 @@ class DataBase:
                 return "notenoughmoney", data1, None
         else:
             return None
+
+    def get_persistent_msgs(self, user_id: int, user_name: str, user_language: str, create_usr=True):
+        self.db_cursor.execute(f"""
+        SELECT {ID}, {NAME}, {WEALTH}, {SCORE}, {LANGUAGE}
+        FROM users
+        WHERE id = {user_id};""")
+        i = self.db_cursor.fetchone()
+        if i:
+            data = {ID: i[0], NAME: i[1], WEALTH: i[2], SCORE: i[3], LANGUAGE: i[4]}
+            self.db_cursor.execute(f"""
+            UPDATE users SET
+            name = "{user_name}"
+            WHERE id = {data.get(ID)};""")
+            return data.get(WEALTH)
+        elif create_usr:
+            self.db_cursor.execute(f"""
+            INSERT INTO users ({ID}, {NAME}, {WEALTH}, {SCORE}, {LANGUAGE})
+            VALUES ({user_id}, "{user_name}", 0, 0, "{user_language}");""")
+            return "usercreated"
+        else:
+            return "nouser"
+
+    def add_persistent_msg(self, user_id: int, user_name: str, user_language: str, create_usr=True):
+        self.db_cursor.execute(f"""
+        SELECT {ID}, {NAME}, {WEALTH}, {SCORE}, {LANGUAGE}
+        FROM users
+        WHERE id = {user_id};""")
+        i = self.db_cursor.fetchone()
+        if i:
+            data = {ID: i[0], NAME: i[1], WEALTH: i[2], SCORE: i[3], LANGUAGE: i[4]}
+            self.db_cursor.execute(f"""
+            UPDATE users SET
+            name = "{user_name}"
+            WHERE id = {data.get(ID)};""")
+            return data.get(WEALTH)
+        elif create_usr:
+            self.db_cursor.execute(f"""
+            INSERT INTO users ({ID}, {NAME}, {WEALTH}, {SCORE}, {LANGUAGE})
+            VALUES ({user_id}, "{user_name}", 0, 0, "{user_language}");""")
+            return "usercreated"
+        else:
+            return "nouser"
+
+    def execute(self, q: str, arg: tuple = None, fetchone: bool = True) -> Union[tuple, bool]:
+        self.db_cursor.execute(q, arg) if arg else self.db_cursor.execute(q)
+        i = self.db_cursor.fetchone() if fetchone else self.db_cursor.fetchall()
+        return i or False
 
 
 DB = DataBase()

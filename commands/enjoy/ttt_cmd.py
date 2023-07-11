@@ -75,7 +75,7 @@ _T = T(locale_dict=_locale)
 )
 async def ttt_cmd(interaction: discord.Interaction):
     await interaction.response.defer()
-    _T.set_locale(interaction.locale)
+    _T.set_language(interaction.locale)
     _T.set_string(
         _ls(
             PLAYER1_TURN,

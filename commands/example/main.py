@@ -43,7 +43,7 @@ examplegrp = create_group(EXAMPLE_GRP_NAME, EXAMPLE_GRP_DESC, _locale)
 )
 async def examplecmd(interaction: discord.Interaction):
     await interaction.response.defer(thinking=True)
-    _T.set_locale(locale=interaction.locale)
+    _T.set_language(language=interaction.locale)
     _T.set_string(
         string=_ls(
             EXAMPLE_CMD_ANSWER,

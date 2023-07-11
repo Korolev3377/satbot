@@ -9,6 +9,7 @@ from environment.main import TOKEN, Cfg, Facts
 from environment.variable import *
 from heart.heart import Heart
 from translator.main import T
+from commands.admin.main import CrcView
 
 if __name__ == '__main__':
     class Bot(commands.Bot):
@@ -28,6 +29,7 @@ if __name__ == '__main__':
         async def setup_hook(self):
             self.tree.interaction_check = itr_check
             declare_cmds(self)
+            self.add_view(CrcView())
             await self.tree.set_translator(T())  # Установка переводчика
             await self.tree.sync()  # Синхронизация. Для обновления изменения комманд
 
@@ -38,7 +40,7 @@ if __name__ == '__main__':
 
 
     async def itr_check(interaction: discord.Interaction):  # Проверка на возможность выполнения комманды
-        _T.set_locale(interaction.locale)
+        _T.set_language(interaction.locale)
         _user = interaction.user.id
 
         # Системные комманды могут вызываться без последствий

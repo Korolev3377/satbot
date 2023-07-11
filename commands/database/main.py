@@ -34,8 +34,8 @@ _locale = {
     _: {EN: "",
         RU: ""},
 
-    GETBALANCE: {EN: "You have {_} lots.",
-                 RU: "У тебя есть {_} лот."},
+    GETBALANCE: {EN: "You have {lots} lots.",
+                 RU: "У тебя есть {lots} лот."},
     TRANSFER_NAME: {EN: "trasfer",
                     RU: "перевод"},
     TRANSFER_DESC: {EN: "Transfer your lots to outher user",
@@ -82,31 +82,31 @@ wealthgrp = create_group(WEALTH_GRP_NAME, WEALTH_GRP_DESC, _locale)
 )
 async def balancecmd(interaction: discord.Interaction):
     await interaction.response.defer(thinking=True)
-    _T.set_locale(locale=interaction.locale)
+    _T.set_language(language=interaction.locale)
     while LOCK.locked():
         await asyncio.sleep(1)
     async with LOCK:
         DB.connect()
-        data = DB.get_user_info(user_id=interaction.user.id, user_name=interaction.user.name,
-                                user_language=interaction.locale)
-        DB.disconnect()
-        if data == USER_CREATED:
+        i = DB.execute("SELECT id, wealth FROM users WHERE id = ?;",
+                       (interaction.user.id,))
+        if i:
+            DB.execute("UPDATE users SET name = ? WHERE id = ?;",
+                       (interaction.user.name, i[0]))
+            _T.set_string(string=_ls(
+                GETBALANCE,
+                extras={FORMAT: {
+                    "lots": _T.stranslate(st=_ls(i[1]))
+                }}
+            ))
+        else:
+            DB.execute("INSERT INTO users (name, language) VALUES (?, ?);",
+                       (interaction.user.name, interaction.locale))
             _T.set_string(
                 string=_ls(
                     USER_CREATED
                 )
             )
-        else:
-            _T.set_string(
-                string=_ls(
-                    GETBALANCE,
-                    extras={
-                        FORMAT: {
-                            "_": _T.stranslate(st=_ls(data))
-                        }
-                    }
-                )
-            )
+        DB.disconnect()
         await interaction.followup.send(_T.stranslate())
 
 
@@ -114,63 +114,59 @@ async def balancecmd(interaction: discord.Interaction):
     name=namedesc(TRANSFER_NAME, _locale),
     description=namedesc(TRANSFER_DESC, _locale)
 )
-@app_commands.rename(target_user=namedesc(TARGET, _locale), value=namedesc(VALUE, _locale))
-async def trasfercmd(interaction: discord.Interaction, target_user: str, value: app_commands.Range[int, 1, 1000]):
+@app_commands.rename(user2_id=namedesc(TARGET, _locale), value=namedesc(VALUE, _locale))
+async def trasfercmd(interaction: discord.Interaction, user2_id: str, value: app_commands.Range[int, 1, 1000]):
     await interaction.response.defer(thinking=True)
-    _T.set_locale(locale=interaction.locale)
-    while LOCK.locked():
+    _T.set_language(language=interaction.locale)  # Устанавливаем язык переводчика
+    while LOCK.locked():  # Ожидание открытия замка
         await asyncio.sleep(1)
-    async with LOCK:
+    async with LOCK:  # Закрытие замка
+
         try:
-            target_user = int(target_user)
+            user2_id = int(user2_id)  # Проверка на int
         except:
             _T.set_string(
                 string=_ls(
-                    INT_ERROR
+                    INT_ERROR  # Вывод ошибки, если таргет не int
                 )
             )
             await interaction.followup.send(_T.stranslate())
             return
+
         DB.connect()
-        status, data1, data2 = DB.ch_user_money(users=[interaction.user.id, target_user], mode=TRANSFER, value=value)
-        DB.disconnect()
-        if status == TRANSFFERED and data1 and data2:
+        user1 = DB.execute("SELECT name, wealth FROM users WHERE id = ?;",
+                           (interaction.user.id,))  # Получение имени и количество лотов пользователя 1
+        user2 = DB.execute("SELECT name, wealth FROM users WHERE id = ?;",
+                           (user2_id,))  # Получение имени и количество лотов пользователя 2
+        if not user1:
+            _T.set_string(
+                string=_ls(
+                    USER1_NOT_IN_DB
+                )
+            )
+        elif not user2:
+            _T.set_string(
+                string=_ls(
+                    USER2_NOT_IN_DB
+                )
+            )
+        elif user1[1] - value >= 0 and value > 0:
+            DB.execute("UPDATE users SET wealth = ? WHERE id = ?;",
+                       (user1[1] - value, interaction.user.id))
+            DB.execute("UPDATE users SET wealth = ? WHERE id = ?;",
+                       (user2[1] + value, user2_id))
             _T.set_string(
                 string=_ls(
                     TRANSFFERED,
                     extras={
                         FORMAT: {
                             WEALTH: value,
-                            USER_2: data2.get(NAME)
+                            USER_2: user2[0]
                         }
                     }
                 )
             )
-        elif status == USER1_NOT_IN_DB:
-            _T.set_string(
-                string=_ls(
-                    USER1_NOT_IN_DB
-                )
-            )
-        elif status == USER2_NOT_IN_DB:
-            _T.set_string(
-                string=_ls(
-                    USER2_NOT_IN_DB
-                )
-            )
-        elif status == NOT_ENOUGH_MONEY:
-            _T.set_string(
-                string=_ls(
-                    NOT_ENOUGH_MONEY,
-                    extras={
-                        FORMAT: {
-                            WEALTH: data1.get(WEALTH),
-                            VALUE: value
-                        }
-                    }
-                )
-            )
-        elif status == VALUE_ERROR:
+        elif value <= 0:
             _T.set_string(
                 string=_ls(
                     VALUE_ERROR
@@ -179,13 +175,20 @@ async def trasfercmd(interaction: discord.Interaction, target_user: str, value: 
         else:
             _T.set_string(
                 string=_ls(
-                    TRANSFER_ERROR
+                    NOT_ENOUGH_MONEY,
+                    extras={
+                        FORMAT: {
+                            WEALTH: user1[1],
+                            VALUE: value
+                        }
+                    }
                 )
             )
+        DB.disconnect()
         await interaction.followup.send(_T.stranslate())
 
 
-@trasfercmd.autocomplete("target_user")
+@trasfercmd.autocomplete("user2_id")
 async def db_users_autocomplite(interaction: discord.Interaction, current: str):
     while LOCK.locked():
         await asyncio.sleep(0.5)

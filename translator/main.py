@@ -5,7 +5,7 @@ from environment.variable import *
 class T(app_commands.Translator):
     def __init__(self, locale_dict=None):
         super().__init__()
-        self.locale = None
+        self.language = None
         self.string = None
         self.translate_not_found = set()
         if locale_dict:
@@ -172,22 +172,22 @@ class T(app_commands.Translator):
             lang = "en"  # Стандартный язык перевода (он всегда должен быть в словаре)
         return lang
 
-    def set_locale(self, locale):
-        self.locale = locale
+    def set_language(self, language):
+        self.language = language
 
     def set_string(self, string):
         self.string = string
 
-    def stranslate(self, st=None, lc=None):
+    def stranslate(self, st=None, ln=None):
         if st:
             string = st
         else:
             string = self.string
 
-        if lc:
-            locale = lc
+        if ln:
+            language = ln
         else:
-            locale = self.locale
+            language = self.language
 
         if self.locale_dict:
             result = self.locale_dict.get(string.message)  # Наименование, которое нужно перевести
@@ -195,9 +195,9 @@ class T(app_commands.Translator):
                 self.translate_not_found.add(string.message)
                 return string.message
 
-            lang = self.get_lang(locale.value)
+            ln = self.get_lang(language.value)
 
-            result = result.get(lang)  # Получение перевода из locale_dict
+            result = result.get(ln)  # Получение перевода из locale_dict
             if not result:
                 return string.message
 

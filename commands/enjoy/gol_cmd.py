@@ -8,7 +8,6 @@ from discord.app_commands import locale_str as _ls
 from translator.main import T
 from environment.variable import *
 
-
 GAME_OF_LIVE_NAME = "gol_name"
 GAME_OF_LIVE_DESC = "gol_desc"
 START = "start"
@@ -49,7 +48,7 @@ _T = T(locale_dict=_locale)
 )
 async def gol_cmd(interaction: discord.Interaction, size: app_commands.Range[int, 3, 28] = 5):
     await interaction.response.defer()
-    _T.set_locale(interaction.locale)
+    _T.set_language(interaction.locale)
     gol = GameOfLife()
     if 3 <= size <= 13:
         view = GameOfLifeView(interaction.user, gol, size)

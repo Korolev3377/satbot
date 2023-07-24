@@ -81,7 +81,7 @@ async def botsay(interaction: discord.Interaction, msg: str, chnl: str = None):
 async def channel_autocomplite(interaction: discord.Interaction, current: str):
     return [app_commands.Choice(name=str(_.name), value=str(_.id))
             for _ in interaction.client.get_all_channels()
-            if _.name in current and _.type.value in (0,)][:25]
+            if _.name.startswith(current) and _.type.value in (0,)][:25]
 
 
 @admingrp.command(

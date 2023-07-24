@@ -15,24 +15,6 @@ class T(app_commands.Translator):
                 "_": {"en": "_",
                       "ru": "_"},
 
-                "test_n": {"en": "test",
-                           "ru": "тест"},
-
-                "test_d": {"en": "Experemental commands",
-                           "ru": "Эксперементальные комманды"},
-
-                "help_n": {"en": "help",
-                           "ru": "помощь"},
-
-                "help_d": {"en": "Command for output all commands",
-                           "ru": "Команда для вывода всех комманд и их использования"},
-
-                "st_n": {"en": "slap-tangakk",
-                         "ru": "шлепнуть-тангакка"},
-
-                "st_d": {"en": "Command for slap Tangakk",
-                         "ru": "Команда для отшлепывания Тангакка. А так же для тестирования комманд."},
-
                 "cmd_broken": {"en": "Sorry. This command broken! :(",
                                "ru": "Простите. Эта комманда сломана! :("},
 
@@ -45,116 +27,11 @@ class T(app_commands.Translator):
                 "cmd_owneronly": {"en": "Sorry. This command disabled! :(",
                                   "ru": "Простите. Эта комманда отключена! :("},
 
-                "fun_n": {"en": "games",
-                          "ru": "игры"},
-
-                "fun_d": {"en": "Funny commands",
-                          "ru": "Комманды для развлечения"},
-
-                "bf_n": {"en": "brainfuck",
-                         "ru": "брэйнфак"},
-
-                "bf_d": {"en": "Brainfuck code reader",
-                         "ru": "Запустить брэйнфак код"},
-
-                "gol_n": {"en": "game-of-life",
-                          "ru": "игра-в-жизнь"},
-
-                "gol_d": {"en": "Launch Game of life simulation",
-                          "ru": "Запустить симуляцию игры в жизнь"},
-
-                "ttt_n": {"en": "tic-tac-toe",
-                          "ru": "крестики-нолики"},
-
-                "ttt_d": {"en": "Create Tic Tac Toe field",
-                          "ru": "Создать поле для крестиков ноликов"},
-
-                "self_destroy_n": {"en": "self-destruction",
-                                   "ru": "самоуничтожение"},
-
-                "self_destroy_d": {"en": "Mutual self-destruction",
-                                   "ru": "Взаимное самоуничтжение"},
-
-                "cooldown_n": {"en": "cooldown-core",
-                               "ru": "охладить-ядро"},
-
-                "coolldown_d": {"en": "Initialize the core cooling protocol",
-                                "ru": "Инициализировать протокол охлаждения ядра"},
-
-                "facts_count_n": {"en": "how-many-facts",
-                                  "ru": "количество-фактов"},
-
-                "facts_count_d": {"en": "(WIP) How many facts in 8915-7's DataBase",
-                                  "ru": "(WIP) Количество фактов в БазеДанных 8915-7"},
-
-                "nick_blue_n": {"en": "nick-blue",
-                                "ru": "синий-ник"},
-
-                "nick_blue_d": {"en": "(WIP)",
-                                "ru": "(WIP)"},
-
-                "cult_n": {"en": "cults",
-                           "ru": "культы"},
-
-                "cult_d": {"en": "Show guild cults",
-                           "ru": "Показать культы сервера"},
-
-                "dice_n": {"en": "roll-dice",
-                           "ru": "кинуть-игральные-кости"},
-
-                "dice_d": {"en": "Randomizer",
-                           "ru": "Рандомайзер"},
-
-                "dice_args": {"en": "dices",
-                              "ru": "кости"},
-
-                "fact_n": {"en": "enjoy-fact",
-                           "ru": "забавный-факт"},
-
-                "fact_d": {"en": "Let me tell you a enjoy fact",
-                           "ru": "Расскажу вам один забавный факт"},
-
                 "on_cd": {
                     "en": "Whoa, you're overloading my fragile circuits... Please wait {_} seconds before "
                           "making this request again.",
                     "ru": "Оу, ты так мне цепи перегрузишь... Подожди, пожалуйста, {_} секунд, прежде чем "
                           "спрашивать меня об этом снова."},
-
-                "nb_n": {"en": "nickblue",
-                         "ru": "синий-ник"},
-
-                "nb_d": {"en": "Nickblue raffle",
-                         "ru": "Рулетка в честь Синего ника"},
-
-                "join_nb_n": {"en": "join",
-                              "ru": "присоединиться"},
-
-                "join_nb_d": {"en": "Join nickblue raffle",
-                              "ru": "Приcоединиться к рулетке Nick_blue"},
-
-                "left_nb_n": {"en": "exit",
-                              "ru": "выйти"},
-
-                "left_nb_d": {"en": "Exit from nickblue raffle",
-                              "ru": "Выйти из рулетки Nick_blue"},
-
-                "show_nb_n": {"en": "status",
-                              "ru": "статус"},
-
-                "show_nb_d": {"en": "Who is Nickblue and candidates",
-                              "ru": "Кто Nick_blue и кандидаты"},
-
-                "input": {"en": "input",
-                          "ru": "ввод"},
-
-                "code": {"en": "code",
-                         "ru": "код"},
-
-                "size": {"en": "field-size",
-                         "ru": "размер-поля"},
-
-                "command": {"en": "command",
-                            "ru": "комманда"},
 
                 "…": {"en": "...",
                       "ru": "..."}

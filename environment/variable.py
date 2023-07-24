@@ -31,12 +31,16 @@ SCORE = "score"
 LANGUAGE = "language"
 IS_VISIBLE = "is_visible"
 
-ADD = "add"
-SET = "set"
-TRANSFER = "move"
-
 # Замочег для базы данных.
 LOCK = asyncio.Lock()
+
+WEALTH_NAME = {"en": ("hex", "hex"),
+               "kto_chto": ("хекс", "хексы"),
+               "kogo_chego": ("хекса", "хексов"),
+               "komu_chemu": ("хексу", "хексами"),
+               "kogo_chto": ("хекс", "хексы"),
+               "kem_chem": ("хексом", "хексами"),
+               "okom_ochom": ("хексе", "хексах")}
 
 
 def create_group(group_name, group_desc, locale_dict):

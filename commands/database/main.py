@@ -194,10 +194,10 @@ async def db_users_autocomplite(interaction: discord.Interaction, current: str):
         await asyncio.sleep(0.5)
     async with LOCK:
         DB.connect()
+        data = DB.execute("SELECT id, name FROM users WHERE is_visible = 1;", fetchone=False)
         DB.disconnect()
-        data = DB.users
     ac = []
     for _ in data:
-        if _.name.startswith(current):
-            ac.append(app_commands.Choice(name=str(_.name), value=str(_.value)))
+        if _[1].startswith(current):
+            ac.append(app_commands.Choice(name=str(_[1]), value=str(_[0])))
     return ac[:25]

@@ -1,7 +1,10 @@
 import discord
+import pickle as pik
 
 from discord import app_commands
+from discord import ui
 from discord.app_commands import locale_str as _ls
+from commands.database.dbcontrol import DB
 
 from translator.main import T
 from environment.variable import *
@@ -20,7 +23,11 @@ CRCN = "crcn"
 CRCD = "crcd"
 ROLES = "roles"
 CR = "cr"
-TEST = "t"
+CAPBUT = "t"
+CBU = "cby"
+CN = "cn"
+CD = "cd"
+CBY = "cby"
 
 _locale: dict = {
     _: {EN: "",
@@ -42,14 +49,16 @@ _locale: dict = {
           RU: "сообщение"},
     CHNL: {EN: "channel",
            RU: "канал"},
-    CRCN: {EN: "create-role-selection",
-           RU: "создание-выборки-ролей"},
-    CRCD: {EN: "This command only for admins!",
-           RU: "Эта комманда только для админов!"},
+    CN: {EN: "capsule",
+         RU: "капсула"},
+    CD: {EN: "This command only for admins!",
+         RU: "Эта комманда только для админов!"},
     ROLES: {EN: "roles",
             RU: "роли"},
-    TEST: {EN: "t1",
-           RU: "t2"}
+    CAPBUT: {EN: "CAPSULE",
+             RU: "КАПСУЛА"},
+    CBY: {EN: "{user}",
+          RU: "{user}"}
 }
 
 _T = T(locale_dict=_locale)
@@ -85,28 +94,94 @@ async def channel_autocomplite(interaction: discord.Interaction, current: str):
 
 
 @admingrp.command(
-    name=namedesc(CRCN, _locale),
-    description=namedesc(CRCD, _locale),
-    extras={IS_ADMIN_ONLY: True}
+    name=namedesc(CN, _locale),
+    description=namedesc(CD, _locale),
+    extras={IS_ADMIN_ONLY: False}
 )
-@app_commands.rename(rls=namedesc(ROLES, _locale))
-async def crc(interaction: discord.Interaction, rls: str):
+async def capsule(interaction: discord.Interaction):
     await interaction.response.defer(thinking=True, ephemeral=False)
-    roles: list = [interaction.guild.get_role(r) for r in map(int, rls.split())]
-    # create view with button (choice role)
-    # ephemeral view with view.select role and two buttons (add and remove role)
-    view = CrcView(lang=interaction.locale)
-    await interaction.followup.send(view=view)
+    view = CView(interaction.locale)
+    message = await interaction.followup.send(view=view)
+    while LOCK.locked():  # Ожидание открытия замка
+        await asyncio.sleep(1)
+    async with LOCK:  # Закрытие замка
+        message = await message.fetch()
+        DB.connect()
+        DB.execute("INSERT INTO persistent (message_id, data) VALUES (?, ?);", (message.id, pik.dumps({})))
+        DB.disconnect()
 
 
-class CrcView(discord.ui.View):
-    lang = discord.Locale.american_english
+class CView(discord.ui.View):
+    text = None
+    user = None
+    lang = None
 
-    def __init__(self, lang=None):
+    def __init__(self, lang=discord.Locale.american_english):
         super().__init__(timeout=None)
+        self.add_item(self.Cbutton(lang))
         if lang:
             self.lang = lang
 
-    @discord.ui.button(label=_T.stranslate(_ls(TEST), lang), custom_id="crcb")
-    async def crcbutton(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message('View', ephemeral=True)
+    class Cbutton(discord.ui.Button):
+        text = None
+        user = None
+
+        def __init__(self, lang=None):
+            super().__init__(label=_T.stranslate(_ls(CAPBUT), lang), style=discord.ButtonStyle.green ,custom_id="crcb")
+
+        async def callback(self, interaction: discord.Interaction):
+            while LOCK.locked():  # Ожидание открытия замка
+                await asyncio.sleep(1)
+            async with LOCK:  # Закрытие замка
+                message = interaction.message
+                DB.connect()
+                data = pik.loads(DB.execute("SELECT data FROM persistent WHERE message_id = ?;", (message.id,))[0])
+                DB.disconnect()
+            if data:
+                self.text = data.get("text")
+                self.user = data.get("user")
+
+            _T.set_language(language=interaction.locale)
+
+            modal = CapsuleModal(
+                _T.stranslate(
+                    _ls(CAPBUT)
+                ),
+
+                _T.stranslate(
+                    _ls(
+                        CBY,
+                        extras={FORMAT: {"user": self.user}}
+                    )
+                ),
+
+                self.text,
+
+                _T.stranslate(
+                    _ls("D0ne")
+                )
+            )
+
+            await interaction.response.send_modal(modal)
+            if not await modal.wait():
+                while LOCK.locked():  # Ожидание открытия замка
+                    await asyncio.sleep(1)
+                async with LOCK:  # Закрытие замка
+                    DB.connect()
+                    DB.execute("UPDATE persistent SET data = ? WHERE message_id = ?;",
+                               (pik.dumps({"text": modal.text, "user": interaction.user.name}), message.id))
+                    DB.disconnect()
+
+
+class CapsuleModal(ui.Modal):
+    lang = None
+    text = None
+
+    def __init__(self, title, label, oldtext, submit):
+        super().__init__(title=title)
+        self.add_item(ui.TextInput(label=label, default=oldtext, style=discord.TextStyle.paragraph))
+        self.submit = submit
+
+    async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.send_message(self.submit, ephemeral=True)
+        self.text = self.children[0].value

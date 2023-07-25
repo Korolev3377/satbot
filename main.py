@@ -9,7 +9,7 @@ from environment.main import TOKEN, Cfg, Facts
 from environment.variable import *
 from heart.heart import Heart
 from translator.main import T
-from commands.admin.main import CrcView
+from commands.admin.main import CView
 
 if __name__ == '__main__':
     class Bot(commands.Bot):
@@ -29,7 +29,7 @@ if __name__ == '__main__':
         async def setup_hook(self):
             self.tree.interaction_check = itr_check
             declare_cmds(self)
-            self.add_view(CrcView())
+            self.add_view(CView())
             await self.tree.set_translator(T())  # Установка переводчика
             await self.tree.sync()  # Синхронизация. Для обновления изменения комманд
 

@@ -29,4 +29,4 @@ _locale = {
 )
 async def bf_cmd(interaction, code: str, *, enter: str = None):
     await interaction.response.defer(thinking=True)
-    await interaction.followup.send("`"+Brainfuck().run(code, enter)+"`")
+    await interaction.followup.send("`"+Brainfuck().run(code, enter)[:1998]+"`")

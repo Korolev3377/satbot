@@ -38,8 +38,8 @@ _locale = {
         RU: "Выйти"
     },
 
-    FSIZE: {EN: "Field size",
-            RU: "Размер поля"}
+    FSIZE: {EN: "field-size",
+            RU: "размер-поля"}
 }
 
 _T = T(locale_dict=_locale)

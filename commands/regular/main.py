@@ -70,8 +70,8 @@ _locale = {
                  RU: "По участникам"},
     BY_WEALTH: {EN: "By wealth",
                 RU: "По богатству"},
-    DICEARGS: {EN: "Dice",
-               RU: "Игральные кубики"}
+    DICEARGS: {EN: "dice",
+               RU: "игральные-кубики"}
 }
 
 _T = T(locale_dict=_locale)

@@ -21,10 +21,10 @@ _locale = {
         EN: 'Brainfuck code reader',
         RU: 'Запустить брэйнфак-код'
     },
-    CODE: {EN: "Code",
-           RU: "Код"},
-    ENTER: {EN: "Input",
-            RU: "Ввод"}
+    CODE: {EN: "code",
+           RU: "код"},
+    ENTER: {EN: "input",
+            RU: "ввод"}
 }
 
 

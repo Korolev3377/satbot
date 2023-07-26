@@ -249,4 +249,4 @@ async def rolldice(interaction: discord.Interaction, *, dice_args: str):
     if tosay == '':
         await interaction.followup.send(_T.stranslate(_ls(NOTHING_TO_ROLL)))
         return
-    await interaction.followup.send(tosay)
+    await interaction.followup.send(tosay[:2000])

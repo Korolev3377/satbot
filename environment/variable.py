@@ -23,6 +23,7 @@ IS_DISABLED = "disabled"
 IS_BROKEN = "broken"
 IS_ADMIN_ONLY = "admin_only"
 IS_OWNER_ONLY = "owner_only"
+IS_DM_ALLOWED = "allow_dm"
 
 ID = "id"
 NAME = "name"
@@ -72,6 +73,8 @@ def namedesc(name_desc, locale_dict):
     )
 
 
+_ = "_"
+
 # ADMINS
 
 ADMIN_GRP_NAME = "admin_grp_name"
@@ -84,3 +87,26 @@ MODAL_TEXT_LABEL = "modal_text_label"
 MODAL_TITLE = "modal_title"
 DELETE = "delete"
 EDIT = "edit"
+
+# ECONOMIC
+
+
+BALANCE_CHANGED = "balance_changed"
+USER_2 = "user2"
+TARGET = "target"
+VALUE = "value"
+TRANSFER_ERROR = "tansfererror"
+INT_ERROR = "interror"
+VALUE_ERROR = "valueerror"
+NOT_ENOUGH_MONEY = "notenoughmoney"
+USER2_NOT_IN_DB = "nouser2"
+USER1_NOT_IN_DB = "nouser1"
+TRANSFFERED = "tansfered"
+USER_CREATED = "usercreated"
+GETBALANCE = "getbalance"
+WEALTH_GRP_NAME = "wgrpn"
+WEALTH_GRP_DESC = "wgrpd"
+TRANSFER_NAME = "tfn"
+TRANSFER_DESC = "tfd"
+BALANCE_NAME = "wbalancen"
+BALANCE_DESC = "wbalanced"

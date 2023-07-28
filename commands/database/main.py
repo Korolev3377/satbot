@@ -10,30 +10,7 @@ from .dbcontrol import DB
 from translator.main import T
 from environment.variable import *
 
-USER_2 = "user2"
-TARGET = "target"
-VALUE = "value"
-TRANSFER_ERROR = "tansfererror"
-INT_ERROR = "interror"
-VALUE_ERROR = "valueerror"
-NOT_ENOUGH_MONEY = "notenoughmoney"
-USER2_NOT_IN_DB = "nouser2"
-USER1_NOT_IN_DB = "nouser1"
-TRANSFFERED = "tansfered"
-USER_CREATED = "usercreated"
-_ = ""
-GETBALANCE = "getbalance"
-WEALTH_GRP_NAME = "wgrpn"
-WEALTH_GRP_DESC = "wgrpd"
-TRANSFER_NAME = "tfn"
-TRANSFER_DESC = "tfd"
-BALANCE_NAME = "wbalancen"
-BALANCE_DESC = "wbalanced"
-
 _locale = {
-    _: {EN: "",
-        RU: ""},
-
     GETBALANCE: {EN: f"You have {{lots}} {WEALTH_NAME.get('en')[1]}.",
                  RU: f"У тебя есть {{lots}} {WEALTH_NAME.get('kto_chto')[0]}(а/ов)."},
     TRANSFER_NAME: {EN: "trasfer",
@@ -70,7 +47,9 @@ _locale = {
     VALUE: {EN: "amouth",
             RU: "сколько"},
     TARGET: {EN: "target",
-             RU: "кому"}
+             RU: "кому"},
+    BALANCE_CHANGED: {EN: f"Your balance has changed! {{old_value}} >>> {{new_value}} {WEALTH_NAME.get('en')[1]}.",
+                      RU: f"Ваш баланс изменился! {{old_value}} >>> {{new_value}} {WEALTH_NAME.get('kto_chto')[0]}(а/ов)."}
 }
 
 _T = T(locale_dict=_locale)
@@ -83,7 +62,7 @@ wealthgrp = create_group(WEALTH_GRP_NAME, WEALTH_GRP_DESC, _locale)
     description=namedesc(BALANCE_DESC, _locale)
 )
 async def balancecmd(interaction: discord.Interaction):
-    await interaction.response.defer(thinking=True)
+    await interaction.response.defer(thinking=True, ephemeral=True)
     _T.set_language(language=interaction.locale)
     i = await DB.execute("SELECT id, wealth FROM users WHERE id = ?;",
                          (interaction.user.id,))
@@ -113,7 +92,7 @@ async def balancecmd(interaction: discord.Interaction):
 )
 @app_commands.rename(user2_id=namedesc(TARGET, _locale), value=namedesc(VALUE, _locale))
 async def trasfercmd(interaction: discord.Interaction, user2_id: str, value: app_commands.Range[int, 1, 1000]):
-    await interaction.response.defer(thinking=True)
+    await interaction.response.defer(thinking=True, ephemeral=True)
     _T.set_language(language=interaction.locale)  # Устанавливаем язык переводчика
     try:
         user2_id = int(user2_id)  # Проверка на int
@@ -126,9 +105,9 @@ async def trasfercmd(interaction: discord.Interaction, user2_id: str, value: app
         await interaction.followup.send(_T.stranslate())
         return
 
-    user1 = await DB.execute("SELECT name, wealth FROM users WHERE id = ?;",
+    user1 = await DB.execute("SELECT name, wealth, language FROM users WHERE id = ?;",
                              (interaction.user.id,))  # Получение имени и количество лотов пользователя 1
-    user2 = await DB.execute("SELECT name, wealth FROM users WHERE id = ?;",
+    user2 = await DB.execute("SELECT name, wealth, language FROM users WHERE id = ?;",
                              (user2_id,))  # Получение имени и количество лотов пользователя 2
     if not user1:
         _T.set_string(
@@ -177,6 +156,21 @@ async def trasfercmd(interaction: discord.Interaction, user2_id: str, value: app
             )
         )
     await interaction.followup.send(_T.stranslate())
+
+    await interaction.client.get_user(interaction.user.id).send(_T.stranslate(_ls(BALANCE_CHANGED,
+                                                                                  extras={
+                                                                                      FORMAT: {
+                                                                                          "old_value": user1[1],
+                                                                                          "new_value": user1[1] - value
+                                                                                      }
+                                                                                  }), user2[2]))
+    await interaction.client.get_user(user2_id).send(_T.stranslate(_ls(BALANCE_CHANGED,
+                                                                       extras={
+                                                                           FORMAT: {
+                                                                               "old_value": user2[1],
+                                                                               "new_value": user2[1] + value
+                                                                           }
+                                                                       }), user2[2]))
 
 
 @trasfercmd.autocomplete("user2_id")

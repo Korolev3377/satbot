@@ -28,8 +28,8 @@ _locale = {
     USER_CREATED: {
         EN: f"You don't seem to be in my database. I will add you to it. Now you can check your balance, tranfer {WEALTH_NAME.get('en')[1]} and accept the transfer.",
         RU: f"Похоже, вас нету в моей базе данных. Я добавлю вас в нее. Теперь вы можете проверять свой баланс, отправлять и принимать {WEALTH_NAME.get('kto_chto')[1]}."},
-    TRANSFFERED: {EN: f"You transferred {{wealth}} {WEALTH_NAME.get('en')[1]} to a user \"{{user2}}\"",
-                  RU: f"Вы перевели пользователю \"{{user2}}\" {{wealth}} {WEALTH_NAME.get('kto_chto')[0]}(а/ов)."},
+    TRANSFFERED: {EN: f"You have transferred {{wealth}} {WEALTH_NAME.get('en')[1]} to the user \"{{user2}}\"",
+                  RU: f"Вы перевели {{wealth}} {WEALTH_NAME.get('kto_chto')[0]}(а/ов) пользователю \"{{user2}}\"."},
     USER1_NOT_IN_DB: {EN: "Ouh nyo! You not in by database. Please execute \"/wallet balance\" command to fix it.",
                       RU: "Оу нет! Вас нету в моей базе данных. Выполните комманду \"/кошелек баланс\" что бы пофиксить это."},
     USER2_NOT_IN_DB: {
@@ -48,8 +48,14 @@ _locale = {
             RU: "сколько"},
     TARGET: {EN: "target",
              RU: "кому"},
-    BALANCE_CHANGED: {EN: f"Your balance has changed! {{old_value}} >>> {{new_value}} {WEALTH_NAME.get('en')[1]}.",
-                      RU: f"Ваш баланс изменился! {{old_value}} >>> {{new_value}} {WEALTH_NAME.get('kto_chto')[0]}(а/ов)."}
+    BALANCE_CHANGED: {EN: f"Your balance has changed!\n{{old_value}} >>> {{new_value}} {WEALTH_NAME.get('en')[1]}.",
+                      RU: f"Ваш баланс изменился!\n{{old_value}} >>> {{new_value}} {WEALTH_NAME.get('kto_chto')[0]}(а/ов)."},
+    BALANCE_CHANGED + "0": {
+        EN: f"Your balance has changed!\n{{old_value}} >>> {{new_value}} {WEALTH_NAME.get('en')[1]}.\nYou have transferred {{value}} {WEALTH_NAME.get('en')[1]} to the user \"{{user}}\".",
+        RU: f"Ваш баланс изменился!\n{{old_value}} >>> {{new_value}} {WEALTH_NAME.get('kto_chto')[0]}(а/ов).\nВы перевели {{value}} {WEALTH_NAME.get('kto_chto')[0]}(а/ов) пользователю \"{{user}}\"."},
+    BALANCE_CHANGED + "1": {
+        EN: f"Your balance has changed!\n{{old_value}} >>> {{new_value}} {WEALTH_NAME.get('en')[1]}.\nUser \"{{user}}\" has transferred {{value}} {WEALTH_NAME.get('en')[1]} to you.",
+        RU: f"Ваш баланс изменился!\n{{old_value}} >>> {{new_value}} {WEALTH_NAME.get('kto_chto')[0]}(а/ов).\nПользователь \"{{user}}\" перевел вам {{value}} {WEALTH_NAME.get('kto_chto')[0]}(а/ов)."}
 }
 
 _T = T(locale_dict=_locale)
@@ -157,18 +163,22 @@ async def trasfercmd(interaction: discord.Interaction, user2_id: str, value: app
         )
     await interaction.followup.send(_T.stranslate())
 
-    await interaction.client.get_user(interaction.user.id).send(_T.stranslate(_ls(BALANCE_CHANGED,
+    await interaction.client.get_user(interaction.user.id).send(_T.stranslate(_ls(BALANCE_CHANGED + "0",
                                                                                   extras={
                                                                                       FORMAT: {
                                                                                           "old_value": user1[1],
-                                                                                          "new_value": user1[1] - value
+                                                                                          "new_value": user1[1] - value,
+                                                                                          "user": user2[0],
+                                                                                          "value": value
                                                                                       }
                                                                                   }), user2[2]))
-    await interaction.client.get_user(user2_id).send(_T.stranslate(_ls(BALANCE_CHANGED,
+    await interaction.client.get_user(user2_id).send(_T.stranslate(_ls(BALANCE_CHANGED + "1",
                                                                        extras={
                                                                            FORMAT: {
                                                                                "old_value": user2[1],
-                                                                               "new_value": user2[1] + value
+                                                                               "new_value": user2[1] + value,
+                                                                               "user": user1[0],
+                                                                               "value": value
                                                                            }
                                                                        }), user2[2]))
 

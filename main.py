@@ -46,7 +46,7 @@ if __name__ == '__main__':
         _T.set_string(
             _ls("error")
         )
-        await interaction.followup.send(_T.stranslate(), ephemeral=False)
+        await interaction.followup.send(_T.stranslate(), ephemeral=True)
         return False
 
         # Системные комманды могут вызываться без последствий

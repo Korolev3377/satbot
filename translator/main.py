@@ -15,17 +15,23 @@ class T(app_commands.Translator):
                 "_": {EN: "_",
                       RU: "_"},
 
-                "cmd_broken": {EN: "Sorry. This command is broken! :(",
-                               RU: "Простите. Эта комманда сломана! :("},
+                "error": {EN: "Oops, something went wrong!",
+                          RU: "Ой-ей. Что-то пошло не так!"},
 
-                "cmd_disabled": {EN: "Sorry. This command is disabled! :(",
-                                 RU: "Простите. Эта комманда отключена! :("},
+                "cmd_broken": {EN: "I'm sorry. This command is broken! :(",
+                               RU: "Простите. Эта команда сломана! :("},
 
-                "cmd_adminonly": {EN: "Sorry. This command is for admins only! :(",
-                                  RU: "Простите. Эта комманда только для администраторов! :("},
+                "cmd_disabled": {EN: "I'm sorry. This command is disabled! :(",
+                                 RU: "Простите. Эта команда отключена! :("},
 
-                "cmd_owneronly": {EN: "Sorry. This command is disabled! :(",
-                                  RU: "Простите. Эта комманда отключена! :("},
+                "cmd_adminonly": {EN: "I'm sorry. This command is for admins only! :(",
+                                  RU: "Простите. Эта команда только для администраторов! :("},
+
+                "cmd_owneronly": {EN: "I'm sorry. This command very unstable! Usage prohibited. :(",
+                                  RU: "Простите. Эта команда очень нестабильна! Использование запрещено. :("},
+
+                "cmd_dm_prohibited": {EN: "I'm sorry. Most commands cannot be used in private messages. :(",
+                                      RU: "Простите. Большенство команд невозможно использовать в личных сообщениях. :("},
 
                 "on_cooldown": {
                     EN: "Whoa, you're overloading my fragile circuits... "

@@ -1,6 +1,8 @@
 import asyncio
 import time
+import sys
 import discord
+import traceback
 from discord.ext import commands
 from discord.app_commands import locale_str as _ls
 
@@ -28,6 +30,7 @@ if __name__ == '__main__':
 
         async def setup_hook(self):
             self.tree.interaction_check = itr_check
+            self.tree.on_error = on_error_handler
             declare_cmds(self)
             await self.tree.set_translator(T())  # Установка переводчика
             await self.tree.sync()  # Синхронизация. Для обновления изменения комманд
@@ -39,6 +42,19 @@ if __name__ == '__main__':
     _F = Facts()
     _T = T()
 
+    async def on_error_handler(interaction: discord.Interaction, error):  # Проверка на возможность выполнения комманды
+        _T.set_string(
+            _ls("error")
+        )
+        await interaction.followup.send(_T.stranslate(), ephemeral=True)
+        return False
+
+        # Системные комманды могут вызываться без последствий
+        if interaction.command.extras.get(IS_SYSTEM) or interaction.type == discord.InteractionType.autocomplete:
+            if BOT.antispam.get(_user):
+                if BOT.antispam.get(_user).get(USER_LOAD) > 100.0:
+                    BOT.antispam[_user][IS_USER_OVERLOADED] = True
+            return True
 
     async def itr_check(interaction: discord.Interaction):  # Проверка на возможность выполнения комманды
         _T.set_language(interaction.locale)
@@ -50,6 +66,14 @@ if __name__ == '__main__':
                 if BOT.antispam.get(_user).get(USER_LOAD) > 100.0:
                     BOT.antispam[_user][IS_USER_OVERLOADED] = True
             return True
+
+        # Проверка на личные ссообщения
+        if not interaction.command.extras.get(IS_DM_ALLOWED) and not interaction.channel.guild:
+            _T.set_string(
+                _ls("cmd_dm_prohibited")
+            )
+            await interaction.response.send_message(_T.stranslate(), ephemeral=True)
+            return False
 
         # Проверка на перегрузку
         if BOT.antispam.get(_user):
@@ -68,7 +92,7 @@ if __name__ == '__main__':
                         }
                     )
                 )
-                await interaction.response.send_message(_T.stranslate(), ephemeral=False)
+                await interaction.response.send_message(_T.stranslate(), ephemeral=True)
                 return False
 
         # Проверка на отключенную комманду
@@ -76,7 +100,7 @@ if __name__ == '__main__':
             _T.set_string(
                 _ls("cmd_disabled")
             )
-            await interaction.response.send_message(_T.stranslate(), ephemeral=False)
+            await interaction.response.send_message(_T.stranslate(), ephemeral=True)
             return False
 
         # Предупреждение, что эта комманда сломана.
@@ -84,7 +108,7 @@ if __name__ == '__main__':
             _T.set_string(
                 _ls("cmd_broken")
             )
-            await interaction.response.send_message(_T.stranslate(), ephemeral=False)
+            await interaction.response.send_message(_T.stranslate(), ephemeral=True)
             return False
 
         # Проверка на администратора сервера
@@ -93,7 +117,7 @@ if __name__ == '__main__':
                 _T.set_string(
                     _ls("cmd_adminonly")
                 )
-                await interaction.response.send_message(_T.stranslate(), ephemeral=False)
+                await interaction.response.send_message(_T.stranslate(), ephemeral=True)
                 return False
 
         # Проверка на создателя бота
@@ -101,7 +125,7 @@ if __name__ == '__main__':
             _T.set_string(
                 _ls("cmd_owneronly")
             )
-            await interaction.response.send_message(_T.stranslate(), ephemeral=False)
+            await interaction.response.send_message(_T.stranslate(), ephemeral=True)
             return False
 
         if not BOT.antispam.get(_user):
@@ -135,26 +159,27 @@ if __name__ == '__main__':
 
     @BOT.event
     async def on_message(message):
-        if message.author == BOT.user or message.author.bot or message.guild.get_member(872406824765251594):
-            return
+        if message.guild:
+            if message.author == BOT.user or message.author.bot or message.guild.get_member(872406824765251594):
+                return
 
-        msg = message.content.lower()
+            msg = message.content.lower()
 
-        if lang := _F.find_fact(msg=msg):
-            if fact := await _F.read_facts(guild=message.guild, lang=lang):
-                await message.channel.send(fact)
+            if lang := _F.find_fact(msg=msg):
+                if fact := await _F.read_facts(guild=message.guild, lang=lang):
+                    await message.channel.send(fact)
 
-        """bot_mention = re.search(
-            r"(\b8915-7\b|"
-            r"\b872406824765251594\b|"
-            r"\bбарменбот(а|у|ом|е|ы|ов|ам|ами|ах|о)?\b|"
-            r"\bбармен(а|у|ом|е|ы|ов|ам|ами|ах|о)?\b|"
-            r"\bфактобот(а|у|ом|е|ы|ов|ам|ами|ах|о)?\b"
-            r"|\bббот\b|"
-            r"\bbbot\b|"
-            r"\bbarmen\b|"
-            r"\bbartender\b|"
-            r"\bbartenderbot\b)", msg)"""
+            """bot_mention = re.search(
+                r"(\b8915-7\b|"
+                r"\b872406824765251594\b|"
+                r"\bбарменбот(а|у|ом|е|ы|ов|ам|ами|ах|о)?\b|"
+                r"\bбармен(а|у|ом|е|ы|ов|ам|ами|ах|о)?\b|"
+                r"\bфактобот(а|у|ом|е|ы|ов|ам|ами|ах|о)?\b"
+                r"|\bббот\b|"
+                r"\bbbot\b|"
+                r"\bbarmen\b|"
+                r"\bbartender\b|"
+                r"\bbartenderbot\b)", msg)"""
 
 
     @BOT.event

@@ -99,7 +99,7 @@ if __name__ == '__main__':
         _T.set_string(
             _ls("error")
         )
-        BOT.logger.error(error, interaction)
+        BOT.logger.error(error, interaction.user, interaction)
         await interaction.followup.send(_T.stranslate(), ephemeral=True)
         return False
 

@@ -6,9 +6,9 @@ import pymorphy2
 from discord import app_commands
 from discord.app_commands import locale_str as _ls
 from discord.app_commands import Choice
-from .dbcontrol import DB
+from commands.database import DB
 
-from translator.main import T
+from translator.__init__ import T
 from environment.variable import *
 
 MORPH_RU = pymorphy2.MorphAnalyzer(lang="ru")
@@ -105,6 +105,9 @@ async def balancecmd(interaction: discord.Interaction):
 async def trasfercmd(interaction: discord.Interaction, user2_id: str, value: app_commands.Range[int, 1, 1000]):
     await interaction.response.defer(thinking=True, ephemeral=True)
     _T.set_language(language=interaction.locale)  # Устанавливаем язык переводчика
+    r = 0
+    string = TRANSFER_ERROR
+    extras = None
     try:
         user2_id = int(user2_id)  # Проверка на int
     except:
@@ -117,7 +120,7 @@ async def trasfercmd(interaction: discord.Interaction, user2_id: str, value: app
         return
 
     if interaction.user.id == user2_id:
-        interaction.client.logger.warning(f"Пользователь {interaction.user.name} пробует перевести лоты себе самому.")
+        interaction.client.logger.debug(f"Пользователь {interaction.user.name} пробует перевести лоты себе самому.")
 
     user1 = await DB.execute("SELECT name, wealth, language FROM users WHERE id = ?;",
                              (interaction.user.id,))  # Получение имени и количество лотов пользователя 1
@@ -132,13 +135,8 @@ async def trasfercmd(interaction: discord.Interaction, user2_id: str, value: app
         await interaction.followup.send(_T.stranslate())
         return
     elif not user2:
-        _T.set_string(
-            string=_ls(
-                USER2_NOT_IN_DB
-            )
-        )
-        await interaction.followup.send(_T.stranslate())
-        return
+        string = USER2_NOT_IN_DB
+        r = 1
     elif user1[1] - value >= 0 and value > 0:
         await DB.execute("UPDATE users SET wealth = ? WHERE id = ?;",
                          (user1[1] - value, interaction.user.id))
@@ -146,17 +144,12 @@ async def trasfercmd(interaction: discord.Interaction, user2_id: str, value: app
                                  (user2_id,))
         await DB.execute("UPDATE users SET wealth = ? WHERE id = ?;",
                          (user2[1] + value, user2_id))
-        _T.set_string(
-            string=_ls(
-                TRANSFFERED,
-                extras={
-                    FORMAT: {
-                        WEALTH: f"{value} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T)))[0].make_agree_with_number(value).word}",
-                        USER_2: user2[0]
-                    }
-                }
-            )
-        )
+
+        string = TRANSFFERED,
+        extras = {FORMAT: {
+            WEALTH: f"{value} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T)))[0].make_agree_with_number(value).word}",
+            USER_2: user2[0]}}
+
         await interaction.followup.send(_T.stranslate())
     elif value <= 0:
         _T.set_string(
@@ -179,24 +172,34 @@ async def trasfercmd(interaction: discord.Interaction, user2_id: str, value: app
             )
         )
         await interaction.followup.send(_T.stranslate())
+        r = 1
+
+    _T.set_string(
+        string=_ls(
+            string
+        )
+    )
+    await interaction.followup.send(_T.stranslate())
+
+    if r:
         return
 
     await interaction.client.get_user(interaction.user.id).send(_T.stranslate(_ls(BALANCE_CHANGED + "0",
                                                                                   extras={
                                                                                       FORMAT: {
-                                                                                          "old_value": f"{user1[1]} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T)))[0].make_agree_with_number(user1[1]).word}",
-                                                                                          "new_value": f"{user1[1] - value} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T)))[0].make_agree_with_number(user1[1] - value).word}",
+                                                                                          "old_value": f"{user1[1]} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T), user1[2]))[0].make_agree_with_number(user1[1]).word}",
+                                                                                          "new_value": f"{user1[1] - value} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T), user1[2]))[0].make_agree_with_number(user1[1] - value).word}",
                                                                                           "user": user2[0],
                                                                                           VALUE: f"{value} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T)))[0].make_agree_with_number(value).word}"
                                                                                       }
-                                                                                  }), user2[2]))
+                                                                                  }), user1[2]))
     await interaction.client.get_user(user2_id).send(_T.stranslate(_ls(BALANCE_CHANGED + "1",
                                                                        extras={
                                                                            FORMAT: {
-                                                                               "old_value": f"{user2[1]} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T)))[0].make_agree_with_number(user2[1]).word}",
+                                                                               "old_value": f"{user2[1]} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T), user2[2]))[0].make_agree_with_number(user2[1]).word}",
                                                                                "new_value": f"{user2[1] + value} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T)))[0].make_agree_with_number(user2[1] + value).word}",
                                                                                "user": user1[0],
-                                                                               VALUE: f"{value} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T)))[0].make_agree_with_number(value).word}"
+                                                                               VALUE: f"{value} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T), user2[2]))[0].make_agree_with_number(value).word}"
                                                                            }
                                                                        }), user2[2]))
 

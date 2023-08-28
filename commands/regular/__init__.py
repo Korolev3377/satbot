@@ -5,11 +5,11 @@ import collections as coll
 
 # from environment import Facts
 from discord import app_commands
-from translator.main import T
+from translator.__init__ import T
 from discord.app_commands import locale_str as _ls
 from environment.variable import *
 from environment.facts import Facts
-from commands.database.dbcontrol import DB
+from commands.database import DB
 
 _F = Facts()
 

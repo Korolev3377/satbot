@@ -4,9 +4,9 @@ import pickle as pik
 from discord import app_commands
 from discord import ui
 from discord.app_commands import locale_str as _ls
-from commands.database.dbcontrol import DB
+from commands.database import DB
 
-from translator.main import T
+from translator.__init__ import T
 from environment.variable import *
 
 _locale: dict = {

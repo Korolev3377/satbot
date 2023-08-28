@@ -1,38 +1,38 @@
+import sys
 import asyncio
 import time
-import sys
-import discord
-import traceback
 import logging
-from discord.ext import commands
-from discord.app_commands import locale_str as _ls
 import pickle as pik
 
-from commands.main import declare_cmds
-from environment.main import TOKEN, Cfg, Facts
-from environment.variable import *
-from heart.heart import Heart
-from translator.main import T
-from commands.admin.main import BotsayView
-from commands.database.dbcontrol import DB
+import discord
+from discord.ext import commands
+from discord.app_commands import locale_str as _ls
+
+from commands import declare_commands
+from environment import *
+from heart import Heart
+from translator import T
+from commands.admin import BotsayView
+from commands.database import DB
 
 LOGGING_MODE = logging.INFO
 
 if __name__ == '__main__':
     class Bot(commands.Bot):
         def __init__(self):
-            super().__init__(command_prefix=Cfg.CMD_PREFIX,
+            super().__init__(command_prefix=CONFIG.CMD_PREFIX,
                              help_command=None,
                              strip_after_prefix=True,
-                             intents=Cfg.INTENTS)
+                             intents=CONFIG.INTENTS)
+
             # Настройка логгера.
-            self.logger = logging.getLogger(__name__)
+            self.logger = logging.getLogger('discord')
             self.logger.setLevel(LOGGING_MODE)
 
-            self.formatter = logging.Formatter("[%(asctime)s] [%(levelname)-8s] %(message)s ", datefmt='%Y-%m-%d %H:%M:%S')
+            self.formatter = logging.Formatter("[%(asctime)s] [%(levelname)-8s] %(message)s", '%Y-%m-%d %H:%M:%S')
 
-            curtime = round(time.time())
-            self.handler = logging.FileHandler(f"logs/{curtime}.log", mode='w')
+            curtime = time.strftime("%Y-%m-%d %H:%M:%S")
+            self.handler = logging.FileHandler(f"logs/{curtime}.log", 'w')
 
             self.handler.setFormatter(self.formatter)
 
@@ -43,10 +43,10 @@ if __name__ == '__main__':
             self.logger.addHandler(self.handler)
             self.logger.addHandler(self.stream)
 
-            self.logger.debug(f"Логгер иницилизирован в модуле \"{__name__}\"...")
-
             self.guilds_data = {}
-            self.antispam = {}  # Это ограничитель спама комманд для каждого пользователя.
+
+            self.antispam = {}
+            # Это ограничитель спама комманд для каждого пользователя.
             # Срабатывает при превышении лимита и отключается при понижении до 0.
 
             self.heart = Heart(self)
@@ -56,7 +56,7 @@ if __name__ == '__main__':
         async def setup_hook(self):
             self.tree.interaction_check = itr_check  # Проверка на возможность выполнения команд
             self.tree.on_error = on_error_handler  # Заглушка для ошибок
-            declare_cmds(self)  # Обьявить выбранные команды
+            declare_commands(self)  # Обьявить выбранные команды
             await self.tree.set_translator(T())  # Установка переводчика
             await self.tree.sync()  # Синхронизация. Для обновления изменения комманд
             for i in (BotsayView,):  # Запуск постоянных View
@@ -69,7 +69,7 @@ if __name__ == '__main__':
                 except:
                     data = {
                         "roles_to_sale": {
-                            "role_id": {
+                            ROLE_ID: {
                                 "id": "role_id",
                                 "name": "role name",
                                 "cost": None,
@@ -82,7 +82,7 @@ if __name__ == '__main__':
                             # stock - None - Бесконечное количество
                         },
                         "users_role_inv": {
-                            "user_id": []  # Лист ролей, которые есть у пользователя.
+                            ROLE_ID: []  # Лист ролей, которые есть у пользователя.
                         }
                     }
                     self.guilds_data[g.id] = data
@@ -97,18 +97,11 @@ if __name__ == '__main__':
 
     async def on_error_handler(interaction: discord.Interaction, error):
         _T.set_string(
-            _ls("error")
+            _ls(ERROR)
         )
         BOT.logger.error(error, interaction.user, interaction)
         await interaction.followup.send(_T.stranslate(), ephemeral=True)
         return False
-
-        # Системные комманды могут вызываться без последствий
-        if interaction.command.extras.get(IS_SYSTEM) or interaction.type == discord.InteractionType.autocomplete:
-            if BOT.antispam.get(_user):
-                if BOT.antispam.get(_user).get(USER_LOAD) > 100.0:
-                    BOT.antispam[_user][IS_USER_OVERLOADED] = True
-            return True
 
 
     async def itr_check(interaction: discord.Interaction):  # Проверка на возможность выполнения комманды
@@ -124,44 +117,29 @@ if __name__ == '__main__':
 
         # Проверка на личные ссообщения
         if not interaction.command.extras.get(IS_DM_ALLOWED) and not interaction.channel.guild:
-            _T.set_string(
-                _ls("cmd_dm_prohibited")
-            )
+            _T.set_string(_ls(IS_DM_ALLOWED))
             await interaction.response.send_message(_T.stranslate(), ephemeral=True)
             return False
 
         # Проверка на перегрузку
         if BOT.antispam.get(_user):
             if BOT.antispam.get(_user).get(IS_USER_OVERLOADED):
-                _T.set_string(
-                    _ls(
-                        "on_cooldown",
-                        extras={
-                            FORMAT: {
-                                "_": int(
-                                    BOT.heart.time_to_cooldown(
-                                        BOT.antispam.get(_user).get(USER_LOAD)
-                                    )
-                                )
-                            }
-                        }
-                    )
-                )
+                _T.set_string(locale_str(
+                    ON_COOLDOWN,
+                    {TIME: int(BOT.heart.time_to_cooldown(BOT.antispam.get(_user).get(USER_LOAD)))}))
                 await interaction.response.send_message(_T.stranslate(), ephemeral=True)
                 return False
 
         # Проверка на отключенную комманду
         if interaction.command.extras.get(IS_DISABLED):
-            _T.set_string(
-                _ls("cmd_disabled")
-            )
+            _T.set_string(_ls(IS_DISABLED))
             await interaction.response.send_message(_T.stranslate(), ephemeral=True)
             return False
 
         # Предупреждение, что эта комманда сломана.
         if interaction.command.extras.get(IS_BROKEN):
             _T.set_string(
-                _ls("cmd_broken")
+                _ls(IS_BROKEN)  # FIXME
             )
             await interaction.response.send_message(_T.stranslate(), ephemeral=True)
             return False
@@ -170,7 +148,7 @@ if __name__ == '__main__':
         if not interaction.permissions.administrator and interaction.command.extras.get(IS_ADMIN_ONLY):
             if not await BOT.is_owner(interaction.user):
                 _T.set_string(
-                    _ls("cmd_adminonly")
+                    _ls(IS_DM_ALLOWED)  # FIXME
                 )
                 await interaction.response.send_message(_T.stranslate(), ephemeral=True)
                 return False
@@ -178,7 +156,7 @@ if __name__ == '__main__':
         # Проверка на создателя бота
         if not await BOT.is_owner(interaction.user) and interaction.command.extras.get(IS_OWNER_ONLY):
             _T.set_string(
-                _ls("cmd_owneronly")
+                _ls(IS_OWNER_ONLY)  # FIXME
             )
             await interaction.response.send_message(_T.stranslate(), ephemeral=True)
             return False
@@ -210,8 +188,7 @@ if __name__ == '__main__':
 
     @BOT.event
     async def on_disconnect():
-        BOT.logger.warning(f"""Потеря связи с Дискордом!
-Цикл: {round(BOT.heart.cycle, 3)} - {time.ctime(time.time())}""")
+        BOT.logger.info(f"Переподключение к Дискорду. Цикл: {round(BOT.heart.cycle, 3)}")
 
 
     @BOT.event
@@ -249,4 +226,4 @@ if __name__ == '__main__':
         await member.guild.system_channel.send("{user} :outbox_tray:".format(user=member.mention))
 
 
-    BOT.run(TOKEN, log_formatter=BOT.formatter, log_level=LOGGING_MODE, log_handler=BOT.handler)
+    BOT.run(TOKEN, log_formatter=BOT.formatter, log_handler=logging.NullHandler(), root_logger=True)

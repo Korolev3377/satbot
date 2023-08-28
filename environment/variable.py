@@ -24,6 +24,9 @@ IS_BROKEN = "broken"
 IS_ADMIN_ONLY = "admin_only"
 IS_OWNER_ONLY = "owner_only"
 IS_DM_ALLOWED = "allow_dm"
+ON_COOLDOWN = "on_cooldown"
+ERROR = "error"
+TIME = "time"
 
 ID = "id"
 NAME = "name"
@@ -34,14 +37,6 @@ IS_VISIBLE = "is_visible"
 
 # Замочег для базы данных.
 LOCK = asyncio.Lock()
-
-WEALTH_NAME = {"en": ("hex", "hex"),
-               "kto_chto": ("хекс", "хексы"),
-               "kogo_chego": ("хекса", "хексов"),
-               "komu_chemu": ("хексу", "хексами"),
-               "kogo_chto": ("хекс", "хексы"),
-               "kem_chem": ("хексом", "хексами"),
-               "okom_ochom": ("хексе", "хексах")}
 
 WEALTH_NAME_EN = "hex"
 
@@ -90,6 +85,10 @@ def sort_by(obj_dict, key="id", orig="id", func=sorted):
     return output
 
 
+def locale_str(string: str, format_dict: dict = None):
+    return _ls(string, extras={FORMAT: format_dict})
+
+
 _ = "_"
 
 # ADMINS
@@ -104,6 +103,11 @@ MODAL_TEXT_LABEL = "modal_text_label"
 MODAL_TITLE = "modal_title"
 DELETE = "delete"
 EDIT = "edit"
+
+# FUN
+
+FUN_GROUP_NAME = "fungrp"
+FUN_GROUP_DESC = "fungrp_d"
 
 # ECONOMIC
 
@@ -140,3 +144,7 @@ BUY_ROLES = "shop_cmd"
 SHOP_GROUP_D = "shop_group_desc"
 SHOP_GROUP = "shop_group"
 WEALTH_T = "wt"
+
+# DATA
+
+ROLE_ID = "user_id"

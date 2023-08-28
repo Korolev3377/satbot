@@ -4,7 +4,7 @@ import discord
 from discord import app_commands
 
 from discord.app_commands import locale_str as _ls
-from translator.main import T
+from translator.__init__ import T
 from environment.variable import *
 
 TTT_DESC = "ttt_desc"
@@ -73,7 +73,7 @@ _T = T(locale_dict=_locale)
     name=namedesc(TTT_NAME, _locale),
     description=namedesc(TTT_DESC, _locale)
 )
-async def ttt_cmd(interaction: discord.Interaction):
+async def tictactoe(interaction: discord.Interaction):
     await interaction.response.defer()
     _T.set_language(interaction.locale)
     _T.set_string(

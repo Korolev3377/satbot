@@ -1,12 +1,12 @@
 from discord.ext.commands import when_mentioned_or
 from discord import Intents
-from abc import ABC
 
 
-class Cfg(ABC):
-    CMD_PREFIX = when_mentioned_or(">_", "!")
-    INTENTS = Intents.all()
+def CONFIG(): return
 
+
+CONFIG.CMD_PREFIX = when_mentioned_or(">_", "!")
+CONFIG.INTENTS = Intents.all()
 
 default_cfg_data = {
     "cfg_data": {},

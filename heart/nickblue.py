@@ -141,7 +141,7 @@ Congratulations! I hope we can all move on with our lives now.
                     self.candidates.append(self.non_candidates.pop(0))
         self.current = None
         self.runing = 0
-        if self.enable is 0:
+        if self.enable == 0:
             await self.op_channel.send('STOP')
         else:
             await self.op_channel.send(self.data_pack())

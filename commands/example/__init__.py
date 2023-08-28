@@ -3,7 +3,7 @@ import discord
 from discord import app_commands
 from discord.app_commands import locale_str as _ls
 
-from translator.main import T
+from translator.__init__ import T
 from environment.variable import *
 
 _ = ""

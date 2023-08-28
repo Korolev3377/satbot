@@ -5,7 +5,7 @@ from discord import app_commands
 
 from .games.gol_game import GameOfLife
 from discord.app_commands import locale_str as _ls
-from translator.main import T
+from translator.__init__ import T
 from environment.variable import *
 
 GAME_OF_LIVE_NAME = "gol_name"
@@ -51,7 +51,7 @@ _T = T(locale_dict=_locale)
     extras={USAGE: "gol_doc"}
 )
 @app_commands.rename(size=namedesc(FSIZE, _locale))
-async def gol_cmd(interaction: discord.Interaction, size: app_commands.Range[int, 3, 28] = 5):
+async def gameoflife(interaction: discord.Interaction, size: app_commands.Range[int, 3, 28] = 5):
     await interaction.response.defer()
     _T.set_language(interaction.locale)
     gol = GameOfLife()

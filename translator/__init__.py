@@ -12,32 +12,29 @@ class T(app_commands.Translator):
             self.locale_dict = locale_dict
         else:
             self.locale_dict = {
-                "_": {EN: "_",
-                      RU: "_"},
+                ERROR: {EN: "Oops, something went wrong!",
+                        RU: "Ой-ей. Что-то пошло не так!"},
 
-                "error": {EN: "Oops, something went wrong!",
-                          RU: "Ой-ей. Что-то пошло не так!"},
+                IS_BROKEN: {EN: "I'm sorry. This command is broken! :(",
+                            RU: "Простите. Эта команда сломана! :("},
 
-                "cmd_broken": {EN: "I'm sorry. This command is broken! :(",
-                               RU: "Простите. Эта команда сломана! :("},
+                IS_DISABLED: {EN: "I'm sorry. This command is disabled! :(",
+                              RU: "Простите. Эта команда отключена! :("},
 
-                "cmd_disabled": {EN: "I'm sorry. This command is disabled! :(",
-                                 RU: "Простите. Эта команда отключена! :("},
+                IS_ADMIN_ONLY: {EN: "I'm sorry. This command is for admins only! :(",
+                                RU: "Простите. Эта команда только для администраторов! :("},
 
-                "cmd_adminonly": {EN: "I'm sorry. This command is for admins only! :(",
-                                  RU: "Простите. Эта команда только для администраторов! :("},
+                IS_OWNER_ONLY: {EN: "I'm sorry. This command very unstable! Usage prohibited. :(",
+                                RU: "Простите. Эта команда очень нестабильна! Использование запрещено. :("},
 
-                "cmd_owneronly": {EN: "I'm sorry. This command very unstable! Usage prohibited. :(",
-                                  RU: "Простите. Эта команда очень нестабильна! Использование запрещено. :("},
+                IS_DM_ALLOWED: {EN: "I'm sorry. Most commands cannot be used in private messages. :(",
+                                RU: "Простите. Большенство команд невозможно использовать в личных сообщениях. :("},
 
-                "cmd_dm_prohibited": {EN: "I'm sorry. Most commands cannot be used in private messages. :(",
-                                      RU: "Простите. Большенство команд невозможно использовать в личных сообщениях. :("},
-
-                "on_cooldown": {
+                ON_COOLDOWN: {
                     EN: "Whoa, you're overloading my fragile circuits... "
-                        "Please wait {_} seconds before making this request again.",
+                        "Please wait {time} seconds before making this request again.",
                     RU: "Оу, ты так мне цепи перегрузишь... "
-                        "Подожди, пожалуйста, {_} секунд, прежде чем спрашивать меня об этом снова."},
+                        "Подожди, пожалуйста, {time} секунд, прежде чем спрашивать меня об этом снова."},
 
                 "…": {"en": "...",
                       "ru": "..."}

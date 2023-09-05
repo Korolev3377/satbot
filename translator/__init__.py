@@ -3,11 +3,12 @@ from environment.variable import *
 
 
 class T(app_commands.Translator):
-    def __init__(self, locale_dict=None):
+    def __init__(self, locale_dict=None, bot=None):
         super().__init__()
         self.language = None
         self.string = None
         self.translate_not_found = set()
+        self.bot = bot
         if locale_dict:
             self.locale_dict = locale_dict
         else:
@@ -106,7 +107,12 @@ class T(app_commands.Translator):
                         context=None) -> str:  # Язык клиента дискорда
         if string.extras.get(EXTRAS):
             if string.extras.get(EXTRAS).get(TYPE) == CMD:
-                return string.extras.get(EXTRAS).get(DICT).get(self.get_lang(locale.value))
+                try:
+                    return string.extras.get(EXTRAS).get(DICT).get(self.get_lang(locale.value))
+                except:
+                    self.bot.logger.error(f"Ошибка перевода: {string} - {locale}")
+                    return string.message
+
         else:
             return string.message
 

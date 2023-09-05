@@ -57,7 +57,7 @@ if __name__ == '__main__':
             self.tree.interaction_check = itr_check  # Проверка на возможность выполнения команд
             self.tree.on_error = on_error_handler  # Заглушка для ошибок
             declare_commands(self)  # Обьявить выбранные команды
-            await self.tree.set_translator(T())  # Установка переводчика
+            await self.tree.set_translator(T(bot=self))  # Установка переводчика
             await self.tree.sync()  # Синхронизация. Для обновления изменения комманд
             for i in (BotsayView,):  # Запуск постоянных View
                 self.add_view(i())

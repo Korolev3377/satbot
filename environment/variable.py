@@ -139,6 +139,14 @@ BALANCE_OPA_NAME = "wbon"
 BALANCE_OPA_DESC = "wbod"
 GETBALANCEOPA = "gbo"
 NO_USER_OPA = "nuo"
+USER_FROM = "usrf"
+USER_TO = "usrt"
+ALARM = "alarm"
+TEXT1 = "text1"
+TEXT2 = "text2"
+POV = "pov"
+NOT_DELIVERED = "nd"
+MSG_TO_USER = "msgtu"
 
 # SHOP
 

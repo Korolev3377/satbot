@@ -1,3 +1,4 @@
+import os
 import sys
 import asyncio
 import time
@@ -31,8 +32,12 @@ if __name__ == '__main__':
 
             self.formatter = logging.Formatter("[%(asctime)s] [%(levelname)-8s] %(message)s", '%Y-%m-%d %H:%M:%S')
 
-            curtime = time.strftime("%Y-%m-%d %H:%M:%S")
-            self.handler = logging.FileHandler(f"logs/{curtime}.log", 'w')
+            curtime = time.strftime("%Y-%m-%d %H-%M-%S")
+            try:
+                self.handler = logging.FileHandler("logs/%s.log" % curtime, 'w', encoding="utf-8")
+            except FileNotFoundError:
+                os.mkdir("logs")
+                self.handler = logging.FileHandler("logs/%s.log" % curtime, 'w', encoding="utf-8")
 
             self.handler.setFormatter(self.formatter)
 

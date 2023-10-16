@@ -203,7 +203,7 @@ if __name__ == '__main__':
             ignore = await DB.execute("SELECT value FROM funfact_ignore WHERE id = ?;", (message.author.id,))
             if ignore is False:
                 await DB.execute("INSERT INTO funfact_ignore (id, value) VALUES (?, ?);", (message.author.id, 0))
-                ignore = await DB.execute("SELECT value FROM funfact_ignore WHERE id = ?;", (interaction.user.id,), True)
+                ignore = await DB.execute("SELECT value FROM funfact_ignore WHERE id = ?;", (message.author.id,), True)
             ignore = ignore[0]
             if lang := _F.find_fact(msg=msg) and ignore == 0:
                 if fact := await _F.read_facts(guild=message.guild, lang=lang):

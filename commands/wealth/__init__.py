@@ -130,8 +130,11 @@ async def trasfercmd(interaction: discord.Interaction, user2_id: str, value: app
 
     try:
         user2_id = int(user2_id)  # Проверка на int
+        assert int(user2_id)
     except:
         stdout = ls(INT_ERROR)
+        await interaction.followup.send(_T.stranslate(stdout))
+        return
 
     if interaction.user.id == user2_id:
         interaction.client.logger.debug(f"Пользователь {interaction.user.name} пробует перевести лоты себе самому.")
@@ -171,7 +174,7 @@ async def trasfercmd(interaction: discord.Interaction, user2_id: str, value: app
                 "old_value": f"{user1[1]} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T), user1[2]))[0].make_agree_with_number(user1[1]).word}",
                 "new_value": f"{user1[1] - value} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T), user1[2]))[0].make_agree_with_number(user1[1] - value).word}",
                 USER: user2[0],
-                VALUE: f"{value} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T), user2[2]))[0].make_agree_with_number(value).word}"})
+                VALUE: f"{value} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T), user1[2]))[0].make_agree_with_number(value).word}"})
         text_out = [_T.stranslate(stdout, user1[2])]
         if message:
             text_out.append(_T.stranslate(_ls(MSG)))
@@ -253,6 +256,8 @@ async def trasferopacmd(interaction: discord.Interaction, user1_id: str, user2_i
         user2_id = int(user2_id)  # Проверка на int
     except:
         stdout = ls(INT_ERROR)
+        await interaction.followup.send(_T.stranslate(stdout))
+        return
 
     user1 = await DB.execute("SELECT name, wealth, language FROM users WHERE id = ?;", (user1_id,))
     # Получение имени и количество лотов пользователя 1
@@ -266,15 +271,17 @@ async def trasferopacmd(interaction: discord.Interaction, user1_id: str, user2_i
         stdout = ls(USER2_NOT_IN_DB)
     elif value <= 0:
         stdout = ls(VALUE_ERROR)
-    elif user1[1] - value < 0:
+    elif user1[1] - value < 0 if user1_id != 0 else False:
         stdout = ls(
             NOT_ENOUGH_MONEY, {
                 WEALTH: f"{user1[1]} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T)))[0].make_agree_with_number(user1[1]).word}",
                 VALUE: f"{value} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T)))[0].make_agree_with_number(value).word}"})
     else:
-        await DB.execute("UPDATE users SET wealth = ? WHERE id = ?;", (user1[1] - value, user1_id))
+        if user1_id != 0:
+            await DB.execute("UPDATE users SET wealth = ? WHERE id = ?;", (user1[1] - value, user1_id))
         user2 = await DB.execute("SELECT name, wealth, language FROM users WHERE id = ?;", (user2_id,))
-        await DB.execute("UPDATE users SET wealth = ? WHERE id = ?;", (user2[1] + value, user2_id))
+        if user2_id != 0:
+            await DB.execute("UPDATE users SET wealth = ? WHERE id = ?;", (user2[1] + value, user2_id))
         stdout = ls(
             TRANSFFERED, {
                 WEALTH: f"{value} {MORPH_RU.parse(_T.stranslate(_ls(WEALTH_T)))[0].make_agree_with_number(value).word}",

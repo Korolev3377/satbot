@@ -131,7 +131,11 @@ async def facts(interaction: discord.Interaction):
 async def facts_ignore(interaction: discord.Interaction, action: int):
     await interaction.response.defer(ephemeral=True, thinking=True)
     _T.set_language(interaction.locale)
-    ignore = await DB.execute("SELECT funfact_ignore FROM users WHERE id = ?;", (interaction.user.id,), True)
+    await DB.execute("CREATE TABLE if not exists funfact_ignore (id INTEGER NOT NULL, value INTEGER DEFAULT (0));")
+    ignore = await DB.execute("SELECT value FROM funfact_ignore WHERE id = ?;", (interaction.user.id,), True)
+    if ignore is False:
+        await DB.execute("INSERT INTO funfact_ignore (id, value) VALUES (?, ?);", (interaction.user.id, 0))
+        ignore = await DB.execute("SELECT value FROM funfact_ignore WHERE id = ?;", (interaction.user.id,), True)
     ignore = ignore[0]
     if ignore == action == 0:
         await interaction.followup.send(_T.stranslate(_ls(ALREADY_NONIGNORED)), ephemeral=True)
@@ -140,7 +144,7 @@ async def facts_ignore(interaction: discord.Interaction, action: int):
         await interaction.followup.send(_T.stranslate(_ls(ALREADY_IGNORED)), ephemeral=True)
         return
     elif ignore != action:
-        await DB.execute("UPDATE users SET funfact_ignore = ? WHERE id = ?;", (action, interaction.user.id))
+        await DB.execute("UPDATE funfact_ignore SET value = ? WHERE id = ?;", (action, interaction.user.id))
         if action == 0:
             await interaction.followup.send(_T.stranslate(_ls(REMOVED_FROM_IGNORED)), ephemeral=True)
             return

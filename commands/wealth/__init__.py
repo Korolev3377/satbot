@@ -96,6 +96,15 @@ wealthgrp = create_group(WEALTH_GRP_NAME, WEALTH_GRP_DESC, _locale)
 async def balancecmd(interaction: discord.Interaction):
     await interaction.response.defer(thinking=True, ephemeral=True)
     _T.set_language(language=interaction.locale)
+    await DB.execute("""CREATE TABLE if not exists users (
+    id INTEGER UNIQUE NOT NULL,
+    name STRING  NOT NULL,
+    wealth INTEGER DEFAULT (0),
+    score INTEGER DEFAULT (0),
+    language STRING,
+    funfact_ignore INTEGER DEFAULT (0),
+    is_visible INTEGER DEFAULT (1) 
+    );""")
     i = await DB.execute("SELECT id, wealth FROM users WHERE id = ?;", (interaction.user.id,))
     if i:
         await DB.execute("UPDATE users SET name = ? WHERE id = ?;", (interaction.user.name, i[0]))

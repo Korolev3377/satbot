@@ -4,84 +4,83 @@ import discord
 from discord import app_commands
 
 from discord.app_commands import locale_str as _ls
-from translator.main import T
+from translator.__init__ import T
+from environment.variable import *
 
-locale = {"p1_wait": {"en": "Tic Tac Toe: Waiting for player {player1} :red_circle:",
-                      "ru": "Крестики Нолики: Ожидание игрока {player1} :red_circle:"},
+TTT_DESC = "ttt_desc"
 
-          "p2_wait": {"en": "Tic Tac Toe: Waiting for player {player2} :green_circle:",
-                      "ru": "Крестики Нолики: Ожидание игрока {player2} :green_circle:"},
+TTT_NAME = 'ttt_name'
 
-          "p1_win": {
-              "en": "Tic Tac Toe: Game over\n"
-                    "{player1} :red_circle: Won!\n"
-                    "{player2} :green_circle: Loses!",
-              "ru": "Крестики Нолики: Игра окончена\n"
-                    "{player1} :red_circle: Побеждает!\n"
-                    "{player2} :green_circle: Проигрывает!"},
+PLAYER1_TURN = "p1_wait"
+PLAYER2_TURN = "p2_wait"
+PLAYER1_WIN = "p1_win"
+PLAYER2_WIN = "p2_win"
+DRAW = "draw"
+GAMEOVER = "gameover"
 
-          "p2_win": {
-              "en": "Tic Tac Toe: Game over\n"
-                    "Player {player2} :green_circle: Won!\n"
-                    "Player {player1} :red_circle: Loses!",
-              "ru": "Крестики Нолики: Игра окончена\n"
-                    "Игрок {player2} :green_circle: Побеждает!\n"
-                    "Игрок {player1} :red_circle: Проигрывает!"},
-
-          "draw": {
-              "en": "Tic Tac Toe: Game over\n"
-                    "Draw between\n"
-                    "Player {player1} :red_circle:\n"
-                    "&\n"
-                    "Player  {player2} :green_circle:!",
-              "ru": "Крестики Нолики: Игра окончена\n"
-                    "Ничья между\n"
-                    "Игроком {player1} :red_circle:\n"
-                    "&\n"
-                    "Игроком {player2} :green_circle:!"},
-
-          "gameover": {"en": "Tic Tac Toe: Game over",
-                       "ru": "Крестики Нолики: Игра окончена"}
-          }
-
-_T = T(locale_dict=locale)
-
-ttt_lc = {
-    'ttt_name': {
-        'en': 'tic-tac-toe',
-        'ru': 'крестики-нолики'
+_locale = {
+    TTT_NAME: {
+        EN: 'tic-tac-toe',
+        RU: 'крестики-нолики'
     },
-    "ttt_desc": {
-        'en': 'Emulate tic tac toe field.',
-        'ru': 'Эмулирует поле крестиков ноликов.'
-    }
+    TTT_DESC: {
+        EN: 'Create a Tic-tac-toe field',
+        RU: 'Создать поле для крестиков-ноликов'
+    },
+
+    PLAYER1_TURN: {EN: "Tic Tac Toe: Waiting for player {player1} :red_circle:",
+                   RU: "Крестики Нолики: Ожидание игрока {player1} :red_circle:"},
+
+    PLAYER2_TURN: {EN: "Tic Tac Toe: Waiting for player {player2} :green_circle:",
+                   RU: "Крестики Нолики: Ожидание игрока {player2} :green_circle:"},
+
+    PLAYER1_WIN: {
+        EN: "Tic Tac Toe: Game over\n"
+            "{player1} :red_circle: Won!\n"
+            "{player2} :green_circle: Lost!",
+        RU: "Крестики Нолики: Игра окончена\n"
+            "{player1} :red_circle: Победил!\n"
+            "{player2} :green_circle: Проиграл!"},
+
+    PLAYER2_WIN: {
+        EN: "Tic Tac Toe: Game over\n"
+            "Player {player2} :green_circle: Won!\n"
+            "Player {player1} :red_circle: Lost!",
+        RU: "Крестики Нолики: Игра окончена\n"
+            "Игрок {player2} :green_circle: Победил!\n"
+            "Игрок {player1} :red_circle: Проиграл!"},
+
+    DRAW: {
+        EN: "Tic Tac Toe: Game over\n"
+            "Draw between\n"
+            "Player {player1} :red_circle:\n"
+            "&\n"
+            "Player  {player2} :green_circle:!",
+        RU: "Крестики Нолики: Игра окончена\n"
+            "Ничья между\n"
+            "Игроком {player1} :red_circle:\n"
+            "&\n"
+            "Игроком {player2} :green_circle:!"},
+
+    GAMEOVER: {EN: "Tic Tac Toe: Game over",
+               RU: "Крестики Нолики: Игра окончена"}
 }
+
+_T = T(locale_dict=_locale)
 
 
 @app_commands.command(
-    name=_ls(
-        'ttt_name',
-        extras={
-            'dict': ttt_lc.get('ttt_name'),
-            'type': 'cmd'
-        }
-    ),
-    description=_ls(
-        'ttt_desc',
-        extras={
-            'dict': ttt_lc.get('ttt_desc'),
-            'type': 'cmd'
-        }
-    )
+    name=namedesc(TTT_NAME, _locale),
+    description=namedesc(TTT_DESC, _locale)
 )
-async def tictactoe_cmd(interaction: discord.Interaction):
+async def tictactoe(interaction: discord.Interaction):
     await interaction.response.defer()
-    _T.set_locale(interaction.locale)
+    _T.set_language(interaction.locale)
     _T.set_string(
         _ls(
-            "p1_wait",
+            PLAYER1_TURN,
             extras={
-                "format": {
+                FORMAT: {
                     "player1": "1"
                 }
             }
@@ -177,9 +176,9 @@ class TicTacToeView(discord.ui.View):
                 if self.view.player_two:
                     _T.set_string(
                         _ls(
-                            "p2_wait",
+                            PLAYER2_TURN,
                             extras={
-                                "format": {
+                                FORMAT: {
                                     "player2": self.view.player_two.mention
                                 }
                             }
@@ -189,9 +188,9 @@ class TicTacToeView(discord.ui.View):
                 else:
                     _T.set_string(
                         _ls(
-                            "p2_wait",
+                            PLAYER2_TURN,
                             extras={
-                                "format": {
+                                FORMAT: {
                                     "player2": "2"
                                 }
                             }
@@ -206,9 +205,9 @@ class TicTacToeView(discord.ui.View):
                 if self.view.player_two:
                     _T.set_string(
                         _ls(
-                            "p1_wait",
+                            PLAYER1_TURN,
                             extras={
-                                "format": {
+                                FORMAT: {
                                     "player1": self.view.player_one.mention
                                 }
                             }
@@ -217,9 +216,9 @@ class TicTacToeView(discord.ui.View):
                 else:
                     _T.set_string(
                         _ls(
-                            "p1_wait",
+                            PLAYER1_TURN,
                             extras={
-                                "format": {
+                                FORMAT: {
                                     "player1": "1"
                                 }
                             }
@@ -232,16 +231,16 @@ class TicTacToeView(discord.ui.View):
                 if view.player_one == view.player_two:
                     _T.set_string(
                         _ls(
-                            "gameover"
+                            GAMEOVER
                         )
                     )
                 else:
                     if winner == view.tic:
                         _T.set_string(
                             _ls(
-                                "p1_win",
+                                PLAYER1_WIN,
                                 extras={
-                                    "format": {
+                                    FORMAT: {
                                         "player1": self.view.player_one.mention,
                                         "player2": self.view.player_two.mention
                                     }
@@ -251,9 +250,9 @@ class TicTacToeView(discord.ui.View):
                     elif winner == view.tac:
                         _T.set_string(
                             _ls(
-                                "p2_win",
+                                PLAYER2_WIN,
                                 extras={
-                                    "format": {
+                                    FORMAT: {
                                         "player1": self.view.player_one.mention,
                                         "player2": self.view.player_two.mention}
                                 }
@@ -262,9 +261,9 @@ class TicTacToeView(discord.ui.View):
                     else:
                         _T.set_string(
                             _ls(
-                                "draw",
+                                DRAW,
                                 extras={
-                                    "format": {
+                                    FORMAT: {
                                         "player1": self.view.player_one.mention,
                                         "player2": self.view.player_two.mention
                                     }

@@ -5,56 +5,55 @@ from discord import app_commands
 
 from .games.gol_game import GameOfLife
 from discord.app_commands import locale_str as _ls
-from translator.main import T
+from translator.__init__ import T
+from environment.variable import *
 
-locale = {"start": {"en": "Start",
-                    "ru": "Запустить"},
+GAME_OF_LIVE_NAME = "gol_name"
+GAME_OF_LIVE_DESC = "gol_desc"
+START = "start"
+STOP = "stop"
+EXIT = "exit"
+FSIZE = "fsize"
 
-          "stop": {
-              "en": "Stop",
-              "ru": "Остановить"},
-
-          "exit": {
-              "en": "Exit",
-              "ru": "Выйти"}
-          }
-
-_T = T(locale_dict=locale)
-
-gol_lc = {
-    'gol_name': {
-        'en': 'game-of-live',
-        'ru': 'игра-в-жизнь'
+_locale = {
+    GAME_OF_LIVE_NAME: {
+        EN: 'game-of-live',
+        RU: 'игра-в-жизнь'
     },
-    "gol_desc": {
-        'en': 'Emulate game of live field.',
-        'ru': 'Эмулирует поле игры в жизнь.'
-    }
+    GAME_OF_LIVE_DESC: {
+        EN: 'Launch Game of life simulation',
+        RU: 'Запустить симуляцию Игры в жизнь'
+    },
+    START: {
+        EN: "Start",
+        RU: "Запустить"
+    },
+    STOP: {
+        EN: "Stop",
+        RU: "Остановить"
+    },
+
+    EXIT: {
+        EN: "Exit",
+        RU: "Выйти"
+    },
+
+    FSIZE: {EN: "field-size",
+            RU: "размер-поля"}
 }
+
+_T = T(locale_dict=_locale)
 
 
 @app_commands.command(
-    name=_ls(
-        'gol_name',
-        extras={
-            'dict': gol_lc.get('gol_name'),
-            'type': 'cmd'
-        }
-    ),
-    description=_ls(
-        'gol_desc',
-        extras={
-            'dict': gol_lc.get('gol_desc'),
-            'type': 'cmd'
-        }
-    ),
-    extras={
-        "usage": "gol_doc"
-    }
+    name=namedesc(GAME_OF_LIVE_NAME, _locale),
+    description=namedesc(GAME_OF_LIVE_DESC, _locale),
+    extras={USAGE: "gol_doc"}
 )
-async def gol_cmd(interaction: discord.Interaction, size: app_commands.Range[int, 3, 28] = 5):
+@app_commands.rename(size=namedesc(FSIZE, _locale))
+async def gameoflife(interaction: discord.Interaction, size: app_commands.Range[int, 3, 28] = 5):
     await interaction.response.defer()
-    _T.set_locale(interaction.locale)
+    _T.set_language(interaction.locale)
     gol = GameOfLife()
     if 3 <= size <= 13:
         view = GameOfLifeView(interaction.user, gol, size)
@@ -182,12 +181,12 @@ class GameOfLifeView(discord.ui.View):
             # Control
             elif button_type == "Q":
                 super().__init__(style=discord.ButtonStyle.red,
-                                 label=_T.stranslate(_ls("exit")),
+                                 label=_T.stranslate(_ls(EXIT)),
                                  row=row,
                                  custom_id=button_type)
             elif button_type == "S-E":
                 super().__init__(style=discord.ButtonStyle.green,
-                                 label=_T.stranslate(_ls("start")),
+                                 label=_T.stranslate(_ls(START)),
                                  row=row,
                                  custom_id=button_type)
             else:
@@ -234,10 +233,10 @@ class GameOfLifeView(discord.ui.View):
             elif self.custom_id == "S-E":
                 if view.runing:
                     view.runing = False
-                    self.label = (_T.stranslate(_ls("start")), _T.stranslate(_ls("stop")))[view.runing]
+                    self.label = (_T.stranslate(_ls(START)), _T.stranslate(_ls(STOP)))[view.runing]
                 else:
                     view.runing = True
-                    self.label = (_T.stranslate(_ls("start")), _T.stranslate(_ls("stop")))[view.runing]
+                    self.label = (_T.stranslate(_ls(START)), _T.stranslate(_ls(STOP)))[view.runing]
                     for child in view.children:
                         if child.custom_id in ("Q", "S-E"):
                             child.disabled = False

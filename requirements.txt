@@ -1,2 +1,3 @@
-discord.py
-discord
+discord==2.3.2
+pymorphy2
+dill

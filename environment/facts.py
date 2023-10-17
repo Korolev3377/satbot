@@ -1,6 +1,7 @@
 import random
 import re
 
+
 class Facts:
     async def read_facts(self, guild, lang):
         try:

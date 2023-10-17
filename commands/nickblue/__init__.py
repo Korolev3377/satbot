@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+
 class Nickblue_cmds:
     def __init__(self, BOT):
         nb_group = app_commands.Group(name="nb_n", description="nb_d")

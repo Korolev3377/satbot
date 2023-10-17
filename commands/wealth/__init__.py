@@ -214,7 +214,7 @@ wealthopagrp.default_permissions = discord.Permissions.none()
 
 
 @app_commands.rename(user_id=namedesc(USER, _locale))
-@wealthopagrp.command(name=namedesc(BALANCE_OPA_NAME, _locale), description=namedesc(BALANCE_OPA_DESC, _locale))
+@wealthopagrp.command(name=namedesc(BALANCE_OPA_NAME, _locale), description=namedesc(BALANCE_OPA_DESC, _locale), extras={IS_OWNER_ONLY: True})
 async def balanceopacmd(interaction: discord.Interaction, user_id: str, create: bool = False):
     await interaction.response.defer(thinking=True, ephemeral=True)
     _T.set_language(language=interaction.locale)
@@ -240,7 +240,7 @@ async def db_users_autocomplite(interaction: discord.Interaction, current: str):
     return ac[:25]
 
 
-@wealthopagrp.command(name=namedesc(TRANSFER_OPA_NAME, _locale), description=namedesc(TRANSFER_OPA_DESC, _locale))
+@wealthopagrp.command(name=namedesc(TRANSFER_OPA_NAME, _locale), description=namedesc(TRANSFER_OPA_DESC, _locale), extras={IS_OWNER_ONLY: True})
 @app_commands.rename(user1_id=namedesc(USER_FROM, _locale), user2_id=namedesc(USER_TO, _locale), value=namedesc(VALUE, _locale),
                      alarm=namedesc(ALARM, _locale), text1=namedesc(TEXT1, _locale), text2=namedesc(TEXT2, _locale))
 async def trasferopacmd(interaction: discord.Interaction, user1_id: str, user2_id: str,

@@ -61,7 +61,7 @@ if __name__ == '__main__':
             # Это главный цикл бота. В нем идет пассивное уменьшение КД и проверка на то,
             # когда нужно будет менять Синего ника. Если вообще нужно будет.
 
-            self.sys_var = 1  # Используется для быстрой смены ботов.
+            self.sys_var = 0  # Используется для быстрой смены ботов.
             # Предположим у меня есть бот, в котором я не хочу видеть некоторых функций. В коде я эти функции вырезаю уловием с этим значением.
             # Не зря у меня имя - Костылев.
 
@@ -73,35 +73,23 @@ if __name__ == '__main__':
             await self.tree.sync()  # Синхронизация. Для обновления изменения комманд
             for i in (BotsayView,):  # Запуск постоянных View
                 self.add_view(i())
+
             async for g in self.fetch_guilds():  # Загрузка кофига серверов.
                 await DB.execute(
-                    "CREATE TABLE if not exists servers_config (server_id INTEGER NOT NULL UNIQUE, cfg_data);")
-                data = await DB.execute("SELECT cfg_data FROM servers_config WHERE server_id IS ?;", (g.id,))
+                    "CREATE TABLE if not exists servers_config (server_id NOT NULL UNIQUE, cfg_data);")
+                data = await DB.execute("SELECT cfg_data FROM servers_config WHERE server_id IS ?;", (str(g.id),))
                 try:
                     assert data[0]
-                    self.guilds_data[g.id] = pik.loads(data[0])
+                    self.guilds_data[str(g.id)] = pik.loads(data[0])
                 except:
                     data = {
-                        "roles_to_sale": {
-                            ROLE_ID: {
-                                "id": "role_id",
-                                "name": "role name",
-                                "cost": None,
-                                "stock": 0,
-                                "visible": False
-                            }
-                            # cost - 0 - Бесплатное
-                            # cost - None - Не продается
-                            # stock - 0 - Закончился товар
-                            # stock - None - Бесконечное количество
-                        },
-                        "users_role_inv": {
-                            ROLE_ID: []  # Лист ролей, которые есть у пользователя.
+                        "key": {
+                            "variable": "value"
                         }
                     }
-                    self.guilds_data[g.id] = data
+                    self.guilds_data[str(g.id)] = data
                     await DB.execute("INSERT INTO servers_config (server_id, cfg_data) VALUES (?, ?);",
-                                     (g.id, pik.dumps(self.guilds_data[g.id])))
+                                     (str(g.id), pik.dumps(self.guilds_data[str(g.id)])))
 
 
     BOT = Bot()

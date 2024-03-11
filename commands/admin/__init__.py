@@ -2,6 +2,7 @@ import sys
 
 import discord
 import pickle as pik
+import json
 
 from discord import app_commands
 from discord import ui
@@ -32,24 +33,45 @@ _locale: dict = {
                   RU: "Редактирования сообщения"},
     MODAL_TEXT_LABEL: {EN: "Message content",
                        RU: "Содержание сообщения"},
-    "shopaddrole_cmd_name": {EN: "add-role-to-shop",
-                             RU: "добавить-роль-в-магазин"},
-    "shopaddrole_cmd_desc": {EN: "Add role to shop",
-                             RU: "Добавить роль в магазин"},
-    "role": {EN: "role",
-             RU: "роль"},
-    "cost": {EN: "cost",
-             RU: "стоимость"},
-    "stock": {EN: "stock",
-              RU: "количество"},
-    "visible": {EN: "visible",
-                RU: "видимость"},
+    SHOPADDROLE_CMD_NAME: {EN: "add-role-to-shop",
+                           RU: "добавить-роль-в-магазин"},
+    SHOPADDROLE_CMD_DESC: {EN: "Add role to shop",
+                           RU: "Добавить роль в магазин"},
+    ROLE: {EN: ROLE,
+           RU: "роль"},
+    COST: {EN: COST,
+           RU: "стоимость"},
+    STOCK: {EN: STOCK,
+            RU: "количество"},
+    VISIBLE: {EN: VISIBLE,
+              RU: "видимость"},
     BOT_TERM_NAME: {EN: "shutdown-bot",
                     RU: "выключить-бота"},
     BOT_TERM_DESC: {EN: "Shutdwon bot",
                     RU: "Запустить процедуру отключения бота"},
     SHUTING_DOWN: {EN: "Shuting down...",
-                   RU: "Прощай, жестокий мир..."}
+                   RU: "Прощай, жестокий мир..."},
+    CFG_GET_CMD_NAME: {EN: "get-config-data",
+                       RU: "получить-конфиг"},
+    CFG_GET_CMD_DESC: {EN: "Returns configuration file.",
+                       RU: "Просмотреть конфиг-фаил."},
+    CFG_FOR_SERVER: {EN: "Here {new?}config file for server \"{serv_name}\":\n",
+                     RU: "Вот {new?}конфигурация сервера \"{serv_name}\":\n"},
+    CFG_LOAD_CMD_NAME: {EN: "edit-config-data",
+                        RU: "редактировать-конфиг"},
+    CFG_LOAD_CMD_DESC: {EN: "Returns config edit message in PM.",
+                        RU: "Запускает редактирование конфига."},
+    DETALS_IN_PM: {EN: "Details sent to PM.\n{msg_link}",
+                   RU: "Детали отправлены в личку.\n{msg_link}"},
+    GIMME_CONFIG: {
+        EN: "Send the following message with the configuration file to change the server settings \"{serv_name}\".",
+        RU: "Отправьте следующее сообщение с файлом конфигурации, чтобы изменить настройки сервера \"{serv_name}\"."},
+    NEW: {EN: "**new** ",
+          RU: "**новая** "},
+    NO_FILE_DETECTED: {EN: "No file was detected in your message. Action canceled.",
+                       RU: "В вашем сообщении не обнаружен файл. Действие отменено."},
+    ASYNCIO_TIMEOUT_ERROR: {EN: "The waiting time has expired.",
+                            RU: "Время ожидания истекло."}
 }
 
 _T = T(locale_dict=_locale)
@@ -96,7 +118,8 @@ async def bottermcmd(interaction: discord.Interaction):
     _T.set_language(language=interaction.locale)
     _T.set_string(string=_ls(SHUTING_DOWN))
     await interaction.followup.send(_T.stranslate())
-    interaction.client.logger.critical(f"Пользователь {interaction.user.name} ({interaction.user.id}) запустил команду отключения бота!")
+    interaction.client.logger.critical(
+        f"Пользователь {interaction.user.name} ({interaction.user.id}) запустил команду отключения бота!")
     sys.exit(0)
 
 
@@ -167,12 +190,12 @@ async def channel_autocomplite(interaction: discord.Interaction, current: str):
 
 
 @admingrp.command(
-    name=namedesc("shopaddrole_cmd_name", _locale),
-    description=namedesc("shopaddrole_cmd_desc", _locale),
+    name=namedesc(SHOPADDROLE_CMD_NAME, _locale),
+    description=namedesc(SHOPADDROLE_CMD_DESC, _locale),
     extras={IS_OWNER_ONLY: True}
 )
-@app_commands.rename(role=namedesc("role", _locale), cost=namedesc("cost", _locale), stock=namedesc("stock", _locale),
-                     visible=namedesc("visible", _locale))
+@app_commands.rename(role=namedesc(ROLE, _locale), cost=namedesc(COST, _locale), stock=namedesc(STOCK, _locale),
+                     visible=namedesc(VISIBLE, _locale))
 async def shopaddrolecmd(interaction: discord.Interaction, role: discord.Role, cost: app_commands.Range[int, -1],
                          stock: app_commands.Range[int, -1], visible: bool = True):
     await interaction.response.defer(thinking=True, ephemeral=True)
@@ -187,9 +210,9 @@ async def shopaddrolecmd(interaction: discord.Interaction, role: discord.Role, c
 
     role_data["id"] = str(role.id)
     role_data["name"] = role.name
-    role_data["cost"] = cost if cost >= 0 else None
-    role_data["stock"] = stock if stock >= 0 else None
-    role_data["visible"] = visible
+    role_data[COST] = cost if cost >= 0 else None
+    role_data[STOCK] = stock if stock >= 0 else None
+    role_data[VISIBLE] = visible
 
     rts[str(role.id)] = role_data
 
@@ -198,3 +221,54 @@ async def shopaddrolecmd(interaction: discord.Interaction, role: discord.Role, c
     await DB.execute("UPDATE servers_config SET cfg_data = ? WHERE server_id IS ?;",
                      (pik.dumps(cfg_data), interaction.guild.id))
     await interaction.followup.send("d0ne", ephemeral=True)
+
+
+@admingrp.command(
+    name=namedesc(CFG_GET_CMD_NAME, _locale),
+    description=namedesc(CFG_GET_CMD_DESC, _locale)
+)
+async def cfggcmd(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=True, thinking=True)
+    _T.set_language(language=interaction.locale)
+    with open("config.json", "w") as f:
+        json.dump(interaction.client.guilds_data[str(interaction.guild_id)], fp=f, indent="  ", ensure_ascii=False)
+    _T.set_string(string=ls(CFG_FOR_SERVER, {"new?": "", "serv_name": interaction.guild.name}))
+    det_msg = await interaction.user.send(_T.stranslate(), file=discord.File(r"config.json"))
+    await interaction.followup.send(_T.stranslate(st=ls(DETALS_IN_PM, {"msg_link": det_msg.jump_url})))
+
+
+@admingrp.command(
+    name=namedesc(CFG_LOAD_CMD_NAME, _locale),
+    description=namedesc(CFG_LOAD_CMD_DESC, _locale)
+)
+async def cfglcmd(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=True, thinking=True)
+    _T.set_language(language=interaction.locale)
+    det_msg = await interaction.user.send(_T.stranslate(st=ls(GIMME_CONFIG, {"serv_name": interaction.guild.name})))
+    await interaction.followup.send(_T.stranslate(st=ls(DETALS_IN_PM, {"msg_link": det_msg.jump_url})))
+
+    def check(msg):
+        return msg.channel == interaction.user.dm_channel
+
+    try:
+        message = await interaction.client.wait_for("message", timeout=300, check=check)
+    except asyncio.TimeoutError:
+        _T.set_string(string=ls(ASYNCIO_TIMEOUT_ERROR))
+        await det_msg.reply(_T.stranslate())
+    else:
+        if len(message.attachments) > 0:
+            file = await message.attachments[0].read()
+            cfg = json.loads(file.decode("utf-8"))
+            interaction.client.guilds_data[str(interaction.guild_id)] = cfg
+            await DB.execute("UPDATE servers_config SET cfg_data = ? WHERE server_id = ?;",
+                             (pik.dumps(cfg), str(interaction.guild_id)))
+
+            with open("config.json", "w") as f:
+                json.dump(interaction.client.guilds_data[str(interaction.guild_id)], fp=f, indent="  ",
+                          ensure_ascii=False)
+            _T.set_string(
+                string=ls(CFG_FOR_SERVER, {"new?": _T.stranslate(st=ls(NEW)), "serv_name": interaction.guild.name}))
+            await message.reply(_T.stranslate(), file=discord.File(r"config.json"))
+        else:
+            _T.set_string(string=ls(NO_FILE_DETECTED))
+            await message.reply(_T.stranslate())

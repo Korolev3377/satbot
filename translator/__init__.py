@@ -110,7 +110,8 @@ class T(app_commands.Translator):
                 try:
                     return string.extras.get(EXTRAS).get(DICT).get(self.get_lang(locale.value))
                 except:
-                    self.bot.logger.error(f"Ошибка перевода: {string} - {locale}")
+                    if locale.value in ("ru", "en-US"):
+                        self.bot.logger.error(f"Ошибка перевода: {string} - {locale.value}")
                     return string.message
 
         else:

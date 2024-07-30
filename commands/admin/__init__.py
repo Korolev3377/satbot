@@ -13,7 +13,24 @@ from commands.database import DB
 from translator.__init__ import T
 from environment.variable import *
 
-_locale: dict = {  # TODO добавить перевод на embed конфигуратор
+RESTORE_BTN = "restore_btn"
+SAVE_BTN = "save_btn"
+CANCEL_BTN = "cancel_btn"
+BACK_BTN = "back_btn"
+ENTER_BTN = "enter_btn"
+MAINA_BTN = "maina_btn"
+VIRA_BTN = "vira_btn"
+
+MODAL_FIELD_EDITING = "modal_field_editing"
+NONE = "none"
+MENU = "menu"
+ACT_CAREFULLY = "act_carefully"
+MAIN_MENU = "main_menu"
+BOT_SETTINGS = "bot_settings"
+CONFIG_EMBED_CMD_DESC = "config_embed_cmd_desc"
+CONFIG_EMBED_CMD_NAME = "config_embed_cmd_name"
+
+_locale: dict = {
   ADMIN_GRP_NAME: {EN: "opa",
                    RU: "опа"},
   ADMIN_GRP_DESC: {EN: "Admins thing",
@@ -52,36 +69,86 @@ _locale: dict = {  # TODO добавить перевод на embed конфи�
                   RU: "Запустить процедуру отключения бота"},
   SHUTING_DOWN: {EN: "Shuting down...",
                  RU: "Прощай, жестокий мир..."},
-  CFG_GET_CMD_NAME: {EN: "get-config-data",
-                     RU: "получить-конфиг"},
-  CFG_GET_CMD_DESC: {EN: "Returns configuration file.",
-                     RU: "Просмотреть конфиг-фаил."},
-  CFG_FOR_SERVER: {EN: "Here {new?}config file for server \"{serv_name}\":\n",
-                   RU: "Вот {new?}конфигурация сервера \"{serv_name}\":\n"},
-  CFG_LOAD_CMD_NAME: {EN: "load-config",
-                      RU: "загрузить-конфиг"},
-  CFG_LOAD_CMD_DESC: {EN: "Returns config load message in PM.",
-                      RU: "Запускает загрузку нового конфига."},
-  DETALS_IN_PM: {EN: "Details sent to PM.\n{msg_link}",
-                 RU: "Детали отправлены в личку.\n{msg_link}"},
-  GIMME_CONFIG: {
-    EN: "Send the following message with the configuration file to change the server settings \"{serv_name}\".",
-    RU: "Отправьте следующее сообщение с файлом конфигурации, чтобы изменить настройки сервера \"{serv_name}\"."},
-  NEW: {EN: "**new** ",
-        RU: "**новая** "},
-  NO_FILE_DETECTED: {EN: "No file was detected in your message. Action canceled.",
-                     RU: "В вашем сообщении не обнаружен файл. Действие отменено."},
-  ASYNCIO_TIMEOUT_ERROR: {EN: "The waiting time has expired.",
-                          RU: "Время ожидания истекло."},
-  DEFAULT_CFG_GET_CMD_NAME: {EN: "default-config-data",
-                             RU: "стандартный-конфиг"},
-  DEFAULT_CFG_GET_CMD_DESC: {EN: "Returns default configuration file.",
-                             RU: "Просмотреть стандартный конфиг-фаил."},
-  DEFAULT_CFG_FOR_SERVER: {EN: "Here default config file:\n",
-                           RU: "Вот стандартная конфигурация для серверов:\n"},
+  CONFIG_EMBED_CMD_NAME: {EN: "bot-settings",
+                          RU: "настройка-бота"},
+  CONFIG_EMBED_CMD_DESC: {EN: "Opens bot config embed",
+                          RU: "Открывает окно конфигурации бота"},
+  BOT_SETTINGS: {EN: "Bot settings",
+                 RU: "Настройки бота"},
+  MAIN_MENU: {EN: "Main menu",
+              RU: "Главное меню"},
+  ACT_CAREFULLY: {EN: "Act carefully. There will NOT be a confirmation of  `Are you sure you want to do this?`!",
+                  RU: "Нажимайте аккуратнее. Подтверждения  `Вы уверены что хотите сделать то-то то-то?`  НЕ будет!"},
+  MENU: {EN: "Menu",
+         RU: "Меню"},
+  NONE: {EN: "No value",
+         RU: "Нет значения"},
+  MODAL_FIELD_EDITING: {EN: "Field editing",
+                        RU: "Редактирование поля"},
+  VIRA_BTN: {EN: "↑ Vira ↑",
+             RU: "↑ Вира ↑"},
+  MAINA_BTN: {EN: "↓ Maina ↓",
+              RU: "↓ Майна ↓"},
+  ENTER_BTN: {EN: "Enter",
+              RU: "Ввод"},
+  BACK_BTN: {EN: "Back",
+             RU: "Назад"},
+  CANCEL_BTN: {EN: "Cancel",
+               RU: "Галя, у нас отмена"},
+  SAVE_BTN: {EN: "Save",
+             RU: "Спаси и сохрани"},
+  RESTORE_BTN: {EN: "Restore default",
+                RU: "Сбросить к заводским"},
+  YES: {EN: "Yes",
+        RU: "Да"},
+  NO: {EN: "No",
+       RU: "Нет"}
+}
+
+_default_cfg_locale = {
+  "wealth_name": {EN: "Wealth name",
+                  RU: "Название валюты"},
+  EN: {EN: "English",
+       RU: "Английское"},
+  RU: {EN: "Russian",
+       RU: "Русское"},
+  # Regular Commands
+  "commands_to_declare": {EN: "Commands to declare",
+                          RU: "Команды для регистрации на сервере"},
+  "facts": {EN: "Add a command to output fun facts?",
+            RU: "Добавить команду на вывод забавных фактов?"},
+  "facts_ignore": {EN: "Add a command to add to the ignore list on the word `fact'?",
+                   RU: "Добавить команду на добавление в список игнорирования на слово `факт`?"},
+  "facts_count": {EN: "Add a command to output the number of facts?",
+                  RU: "Добавить команду на вывод количества фактов?"},
+  "cults": {EN: "Add a command to output a list of cults?",
+            RU: "Добавить команду на вывод списка культов?"},
+  "rolldice": {EN: "Add a dice roll command?",
+               RU: "Добавить команду на бросок кубика?"},
+  # Fun Commands Group
+  "fungrp": {EN: "Add a group of comms for fun (GameOfLife, TicTacToe, Brainfuck)?",
+             RU: "Добавить группу комманд на развлечение (GameOfLife, TicTacToe, Brainfuck)?"},
+  # Wealth Commands
+  "wealthgrp": {EN: "Add a group command to manage a personal wallet?",
+                RU: "Добавить группу команду на управление личным кошельком?"},
+  "wealthopagrp": {EN: "Add a group command to administer server economics?",
+                   RU: "Добавить группу команду на администрирование экономики сервера?"},
+  "fact_word_react": {EN: "React to the word `fact'?",
+                      RU: "Реагировать на слово `факт`?"},
+  "server_member_join_leave": {EN: "Configuring behavior when members joins in and leaves of the server",
+                               RU: "Настройка поведение при входе выходе участников с сервера"},
+  "enable": {EN: "Enable sending a notification of a member's joins/leaves to the server",
+             RU: "Включить отправку уведомление о входе/выходе участника?"},
+  "on_join": {EN: "Message when logging in to the server",
+              RU: "Сообщение при входе на сервер"},
+  "on_leave": {EN: "Message when leaving the server ",
+               RU: "Сообщение при выходе с сервера"},
+  "channel_id": {EN: "Channel where messages will be sent when a member joins/leaves from the server",
+                 RU: "Канал куда будут отправляться сообщения в входе/выходе"}
 }
 
 _T = T(locale_dict=_locale)
+_Tcfg = T(locale_dict=_default_cfg_locale)
 
 admingrp = create_group(ADMIN_GRP_NAME, ADMIN_GRP_DESC, _locale)
 admingrp.default_permissions = discord.Permissions.none()
@@ -195,9 +262,10 @@ async def channel_autocomplite(interaction: discord.Interaction, current: str):
           for channel in interaction.guild.channels
           if current in channel.name and channel.type.value in (0,)][:25]
 
+
 @admingrp.command(
-  name=namedesc("config_embed_cmd_name", _locale),
-  description=namedesc("config_embed_cmd_desc", _locale)
+  name=namedesc(CONFIG_EMBED_CMD_NAME, _locale),
+  description=namedesc(CONFIG_EMBED_CMD_DESC, _locale)
 )
 async def configembedcmd(interaction: discord.Interaction):
   await interaction.response.defer(thinking=True, ephemeral=True)
@@ -205,12 +273,13 @@ async def configembedcmd(interaction: discord.Interaction):
   # _T.set_string(string=ls(EXAMPLE_CMD_ANSWER, {"_": _T.stranslate(st=_ls(FORMAT_STRING))}))
   # await interaction.followup.send(_T.stranslate())
   configview = ConfigView(interaction.client.guilds_data[str(interaction.guild_id)], interaction)
-  embed = discord.Embed(title=_T.stranslate(st=_ls("bot_settings")), description=configview.menu_dict.get("info"))
+  embed = discord.Embed(title=_T.stranslate(st=_ls(BOT_SETTINGS)), description=_T.stranslate(st=_ls(MAIN_MENU)))
   embed = configview.update_embed(embed)
   await interaction.followup.send(
-    "Нажимайте аккуратнее. Подтверждения  `Вы уверены что хотите сделать то-то то-то?`  НЕ будет!",
+    _T.stranslate(st=_ls(ACT_CAREFULLY)),
     embed=embed,
-    view=configview)
+    view=configview
+  )
 
 
 class ConfigView(discord.ui.View):
@@ -220,18 +289,18 @@ class ConfigView(discord.ui.View):
     self.selected = 0
     self.embed = None
     self.path_to_menu = []
-    self.menu_dict = dict(original_config_dict)  # TODO сделать разделение на страницы тут
+    self.menu_dict = dict(original_config_dict)  # сделать разделение на страницы тут
     self.interaction = interaction
 
-    self.add_item(ConfigViraButton())
-    self.add_item(ConfigMainaButton())
-    self.add_item(ConfigEnterButton())
-    self.add_item(ConfigBackButton())
-    # self.add_item(ConfigPrevButton())
-    # self.add_item(ConfigNextButton())
-    self.add_item(ConfigCancelButton())
-    self.add_item(ConfigSaveButton())
-    self.add_item(ConfigRestoreButton())
+    self.add_item(ConfigViraButton(_T.stranslate(_ls(VIRA_BTN))))
+    self.add_item(ConfigMainaButton(_T.stranslate(_ls(MAINA_BTN))))
+    self.add_item(ConfigEnterButton(_T.stranslate(_ls(ENTER_BTN))))
+    self.add_item(ConfigBackButton(_T.stranslate(_ls(BACK_BTN))))
+    # self.add_item(ConfigPrevButton("prev_btn"))
+    # self.add_item(ConfigNextButton("next_btn"))
+    self.add_item(ConfigCancelButton(_T.stranslate(_ls(CANCEL_BTN))))
+    self.add_item(ConfigSaveButton(_T.stranslate(_ls(SAVE_BTN))))
+    self.add_item(ConfigRestoreButton(_T.stranslate(_ls(RESTORE_BTN))))
 
   async def on_timeout(self):
     for child in self.children:
@@ -246,7 +315,7 @@ class ConfigView(discord.ui.View):
 
     embed.clear_fields()
     if len(self.path_to_menu) == 0:
-      embed.description = _T.stranslate(_ls("main_menu"))
+      embed.description = _T.stranslate(_ls(MAIN_MENU))
     else:
       embed.description = self.path_to_menu[-1]
 
@@ -260,15 +329,15 @@ class ConfigView(discord.ui.View):
       embed_field_name = []
       if i == self.selected:
         embed_field_name.append("---> ")
-      embed_field_name.append(_T.stranslate(st=_ls(k)))
+      embed_field_name.append(_Tcfg.stranslate(st=_ls(k), ln=self.interaction.locale))
 
       embed_field_value = []
       if type(v) is dict:
-        embed_field_value.append("= " + _T.stranslate(st=_ls("menu")))
+        embed_field_value.append("= " + _T.stranslate(st=_ls(MENU)))
       elif type(v) is bool:
         embed_field_value.append("- " + [_T.stranslate(st=_ls(NO)), _T.stranslate(st=_ls(YES))][bool(v)])
       elif v is None or len(v) == 0:
-        embed_field_value.append("- " + _T.stranslate(st=_ls("none")))
+        embed_field_value.append("- " + _T.stranslate(st=_ls(NONE)))
       else:
         embed_field_value.append("- `" + v + "`")
       embed.add_field(name="".join(embed_field_name), value="".join(embed_field_value), inline=False)
@@ -278,8 +347,8 @@ class ConfigView(discord.ui.View):
 
 
 class ConfigViraButton(discord.ui.Button):
-  def __init__(self):
-    super().__init__(label="↑ Вира ↑", disabled=False, row=0, custom_id="vira")
+  def __init__(self, name):
+    super().__init__(label=name, disabled=False, row=0, custom_id="vira")
 
   async def callback(self, interaction):
     if self.view.selected > 0:
@@ -288,8 +357,8 @@ class ConfigViraButton(discord.ui.Button):
 
 
 class ConfigMainaButton(discord.ui.Button):
-  def __init__(self):
-    super().__init__(label="↓ Майна ↓", disabled=False, row=0, custom_id="maina")
+  def __init__(self, name):
+    super().__init__(label=name, disabled=False, row=0, custom_id="maina")
 
   async def callback(self, interaction):
     if self.view.selected < len(self.view.embed.fields) - 1:
@@ -298,8 +367,8 @@ class ConfigMainaButton(discord.ui.Button):
 
 
 class ConfigEnterButton(discord.ui.Button):
-  def __init__(self):
-    super().__init__(label="Ввод", disabled=False, style=discord.ButtonStyle.blurple, row=0, custom_id="enter")
+  def __init__(self, name):
+    super().__init__(label=name, disabled=False, style=discord.ButtonStyle.blurple, row=0, custom_id="enter")
 
   async def callback(self, interaction):
     selected_menu = dict(self.view.menu_dict)
@@ -326,7 +395,7 @@ class ConfigEnterButton(discord.ui.Button):
 
       class TextEditModal(discord.ui.Modal):
         def __init__(self, view):
-          super().__init__(title=_T.stranslate(_ls("modal_field_editing")))
+          super().__init__(title=_T.stranslate(_ls(MODAL_FIELD_EDITING)))
           self.view = view
           self.add_item(discord.ui.TextInput(label=list(selected_menu.keys())[self.view.selected],
                                              default=list(selected_menu.values())[self.view.selected], required=False))
@@ -343,8 +412,8 @@ class ConfigEnterButton(discord.ui.Button):
 
 
 class ConfigBackButton(discord.ui.Button):
-  def __init__(self):
-    super().__init__(label="Назад", disabled=False, row=0, custom_id="back")
+  def __init__(self, name):
+    super().__init__(label=name, disabled=False, row=0, custom_id="back")
 
   async def callback(self, interaction):
     if len(self.view.path_to_menu) > 0:
@@ -353,19 +422,19 @@ class ConfigBackButton(discord.ui.Button):
     await interaction.response.edit_message(embed=self.view.update_embed(self.view.embed))
 
 
-class ConfigPrevButton(discord.ui.Button):  # TODO перелистывания страниц
-  def __init__(self):
-    super().__init__(label="<<< Пред. страница", disabled=True, row=1, custom_id="prev")
+class ConfigPrevButton(discord.ui.Button):  # перелистывания страниц
+  def __init__(self, name):
+    super().__init__(label=name, disabled=True, row=1, custom_id="prev")
 
 
-class ConfigNextButton(discord.ui.Button):  # TODO перелистывание страниц
-  def __init__(self):
-    super().__init__(label="След. страница >>>", disabled=True, row=1, custom_id="next")
+class ConfigNextButton(discord.ui.Button):  # перелистывание страниц
+  def __init__(self, name):
+    super().__init__(label=name, disabled=True, row=1, custom_id="next")
 
 
 class ConfigCancelButton(discord.ui.Button):
-  def __init__(self):
-    super().__init__(label="Галя, у нас отмена", disabled=False, style=discord.ButtonStyle.red, row=2,
+  def __init__(self, name):
+    super().__init__(label=name, disabled=False, style=discord.ButtonStyle.red, row=2,
                      custom_id="cancel")
 
   async def callback(self, interaction):
@@ -376,8 +445,8 @@ class ConfigCancelButton(discord.ui.Button):
 
 
 class ConfigSaveButton(discord.ui.Button):
-  def __init__(self):
-    super().__init__(label="Спаси и сохрани", disabled=False, style=discord.ButtonStyle.green, row=2, custom_id="save")
+  def __init__(self, name):
+    super().__init__(label=name, disabled=False, style=discord.ButtonStyle.green, row=2, custom_id="save")
 
   async def callback(self, interaction):
     for child in self.view.children:
@@ -390,6 +459,6 @@ class ConfigSaveButton(discord.ui.Button):
     await commands.declare_commands(interaction.client)
 
 
-class ConfigRestoreButton(discord.ui.Button):
-  def __init__(self):
-    super().__init__(label="Сбросить к заводским", disabled=True, row=2, custom_id="restore")
+class ConfigRestoreButton(discord.ui.Button):  # TODO
+  def __init__(self, name):
+    super().__init__(label=name, disabled=True, row=2, custom_id="restore")

@@ -102,10 +102,8 @@ _locale: dict = {
   YES: {EN: "Yes",
         RU: "Да"},
   NO: {EN: "No",
-       RU: "Нет"}
-}
-
-_default_cfg_locale = {
+       RU: "Нет"},
+  #
   "wealth_name": {EN: "Wealth name",
                   RU: "Название валюты"},
   EN: {EN: "English",
@@ -148,7 +146,6 @@ _default_cfg_locale = {
 }
 
 _T = T(locale_dict=_locale)
-_Tcfg = T(locale_dict=_default_cfg_locale)
 
 admingrp = create_group(ADMIN_GRP_NAME, ADMIN_GRP_DESC, _locale)
 admingrp.default_permissions = discord.Permissions.none()
@@ -317,7 +314,7 @@ class ConfigView(discord.ui.View):
     if len(self.path_to_menu) == 0:
       embed.description = _T.stranslate(_ls(MAIN_MENU))
     else:
-      embed.description = self.path_to_menu[-1]
+      embed.description = _T.stranslate(_ls(self.path_to_menu[-1]))
 
     i = 0
 
@@ -329,7 +326,7 @@ class ConfigView(discord.ui.View):
       embed_field_name = []
       if i == self.selected:
         embed_field_name.append("---> ")
-      embed_field_name.append(_Tcfg.stranslate(st=_ls(k), ln=self.interaction.locale))
+      embed_field_name.append(_T.stranslate(st=_ls(k)))
 
       embed_field_value = []
       if type(v) is dict:
@@ -389,7 +386,7 @@ class ConfigEnterButton(discord.ui.Button):
 
       edited_menu_dict[keys[-1]] = new_value
       await interaction.response.edit_message(embed=self.view.update_embed(self.view.embed))
-    elif type(selected_menu.get(list(selected_menu.keys())[self.view.selected])) is str:
+    else:
       keys = list(self.view.path_to_menu)
       keys.append(list(selected_menu.keys())[self.view.selected])
 

@@ -29,8 +29,8 @@ CONFIG.DEFAULT_CFG = {
   "fact_word_react": False,
   "server_member_join_leave": {
     "enable": False,
-    "on_join": "{user} :inbox_tray:",
-    "on_leave": "{user} :outbox_tray:",
+    "on_join": "{user_name} {user_mention} {user_id} :inbox_tray:",
+    "on_leave": "{user_name} {user_mention} {user_id} :outbox_tray:",
     "channel_id": ""
   }
 }

@@ -228,12 +228,54 @@ if __name__ == '__main__':
 
     @BOT.event
     async def on_member_join(member: discord.Member):
-        await member.guild.system_channel.send("{user} :inbox_tray:".format(user=member.mention))
+        status_1, code_1 = check_config(BOT.guilds_data, [str(member.guild.id), "server_member_join_leave", "enable"])
+        status_2, code_2 = check_config(BOT.guilds_data, [str(member.guild.id), "server_member_join_leave", "on_join"])
+        status_3, code_3 = check_config(BOT.guilds_data, [str(member.guild.id), "server_member_join_leave", "on_leave"])
+        status_4, code_4 = check_config(BOT.guilds_data, [str(member.guild.id), "server_member_join_leave", "channel_id"])
+
+        codes = {
+            0: f"Ошибка в конфигурации сервера \"{member.guild.name}\": Нету конфигурации для сервера.",
+            1: f"Ошибка в конфигурации сервера \"{member.guild.name}\": Проблема \"server_member_join_leave\" в конфигурации сервера.",
+            2: f"Ошибка в конфигурации сервера \"{member.guild.name}\": Отсутствует внутренний парамтер в \"server_member_join_leave\""
+        }
+        if status_1:
+            if BOT.guilds_data.get(str(member.guild.id)).get("server_member_join_leave").get("enable"):
+                if status_2 and status_3 and status_3:
+                    if not BOT.guilds_data.get(str(member.guild.id)).get("server_member_join_leave").get("channel_id"):
+                        channel = member.guild.system_channel
+                    else:
+                        channel = member.guild.get_channel(int(BOT.guilds_data.get(str(member.guild.id)).get("server_member_join_leave").get("channel_id")))
+                    await channel.send(BOT.guilds_data.get(str(member.guild.id)).get("server_member_join_leave").get("on_join").format(user_mention=member.mention, user_id=member.id, user_name=member.name))
+        else:
+            BOT.logger.error(codes.get(code_1))
 
 
     @BOT.event
     async def on_member_remove(member: discord.Member):
-        await member.guild.system_channel.send("{user} :outbox_tray:".format(user=member.mention))
+        status_1, code_1 = check_config(BOT.guilds_data, [str(member.guild.id), "server_member_join_leave", "enable"])
+        status_2, code_2 = check_config(BOT.guilds_data, [str(member.guild.id), "server_member_join_leave", "on_join"])
+        status_3, code_3 = check_config(BOT.guilds_data, [str(member.guild.id), "server_member_join_leave", "on_leave"])
+        status_4, code_4 = check_config(BOT.guilds_data,
+                                        [str(member.guild.id), "server_member_join_leave", "channel_id"])
+
+        codes = {
+            0: f"Ошибка в конфигурации сервера \"{member.guild.name}\": Нету конфигурации для сервера.",
+            1: f"Ошибка в конфигурации сервера \"{member.guild.name}\": Проблема \"server_member_join_leave\" в конфигурации сервера.",
+            2: f"Ошибка в конфигурации сервера \"{member.guild.name}\": Отсутствует внутренний парамтер в \"server_member_join_leave\""
+        }
+        if status_1:
+            if BOT.guilds_data.get(str(member.guild.id)).get("server_member_join_leave").get("enable"):
+                if status_2 and status_3 and status_3:
+                    if not BOT.guilds_data.get(str(member.guild.id)).get("server_member_join_leave").get("channel_id"):
+                        channel = member.guild.system_channel
+                    else:
+                        channel = member.guild.get_channel(
+                            int(BOT.guilds_data.get(str(member.guild.id)).get("server_member_join_leave").get("channel_id")))
+                    await channel.send(
+                        BOT.guilds_data.get(str(member.guild.id)).get("server_member_join_leave").get("on_leave").format(
+                            user_mention=member.mention, user_id=member.id, user_name=member.name))
+        else:
+            BOT.logger.error(codes.get(code_1))
 
 
     BOT.run(TOKEN, log_formatter=BOT.formatter, log_handler=logging.NullHandler(), root_logger=True)

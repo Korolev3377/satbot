@@ -37,4 +37,5 @@ async def declare_commands(bot):
             else:
                 bot.logger.error(codes.get(code))
         await bot.tree.sync(guild=g)  # Синхронизация. Для обновления изменения комманд
+    await bot.tree.sync()
     bot.logger.info("Обновление команд завершено.")

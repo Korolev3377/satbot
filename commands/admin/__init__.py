@@ -456,6 +456,10 @@ class ConfigSaveButton(discord.ui.Button):
     await commands.declare_commands(interaction.client)
 
 
-class ConfigRestoreButton(discord.ui.Button):  # TODO
+class ConfigRestoreButton(discord.ui.Button):
   def __init__(self, name):
-    super().__init__(label=name, disabled=True, row=2, custom_id="restore")
+    super().__init__(label=name, disabled=False, row=2, custom_id="restore")
+
+  async def callback(self, interaction):
+    self.view.menu_dict = environment.CONFIG.DEFAULT_CFG
+    await interaction.response.edit_message(embed=self.view.update_embed(self.view.embed), view=self.view)

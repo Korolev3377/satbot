@@ -213,7 +213,7 @@ if __name__ == '__main__':
                 url = url.replace("\n", "")
                 print(TG_TOKEN)
                 values = {"chat_id": tg_chat_and_thread[0],
-                          "text": message.content,
+                          "text": f"{message.author.name}: {message.content}",
                           "message_thread_id": tg_chat_and_thread[1]}
 
                 headers = {

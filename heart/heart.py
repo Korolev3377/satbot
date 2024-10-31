@@ -62,8 +62,7 @@ class Heart:
             values = urllib.parse.urlencode(values)
             conn = httplib.HTTPSConnection(host)
             conn.request("POST", url, values, headers)
-          self.BOT.guilds_data.get(str(upd.get("message").get("chat").get("id"))).get(str(upd.get("message").get("message_thread_id")))
-          discord_channel_id = mf.split(":")[0]  # "1090104010005050103"
+          discord_channel_id = self.BOT.guilds_data.get(str(upd.get("message").get("chat").get("id"))).get(str(upd.get("message").get("message_thread_id")))
           self.BOT.logger.info(["discord_channel_id", discord_channel_id])
           await self.BOT.get_channel(int(discord_channel_id)).send(f"{upd.get('message').get('from').get('username')}:\n{upd.get('message').get('text')}")
       except:

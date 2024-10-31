@@ -1,6 +1,7 @@
 import time
 import http.client as httplib
 import urllib
+import json
 
 from discord.ext import tasks
 from environment import TG_TOKEN
@@ -42,7 +43,7 @@ class Heart:
         response = conn.getresponse()
 
         data = response.read()
-        print(data)
+        print("OK?: ", json.loads(data).get("ok"))
 
         for _id, _user in dict(self.BOT.antispam).items():
             if _user.get('overload') > 0:  # Пассивное охлаждение

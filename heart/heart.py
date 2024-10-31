@@ -24,7 +24,7 @@ class Heart:
 
   @tasks.loop(seconds=loop_seconds, reconnect=False)
   async def beat(self):
-    """host = 'api.telegram.org'
+    host = 'api.telegram.org'
     url = '/bot' + TG_TOKEN + '/getUpdates'
     url = url.replace("\n", "")
 
@@ -66,7 +66,7 @@ class Heart:
           self.BOT.logger.info(["discord_channel_id", discord_channel_id])
           await self.BOT.get_channel(int(discord_channel_id)).send(f"{upd.get('message').get('from').get('username')}:\n{upd.get('message').get('text')}")
       except:
-        pass"""
+        pass
 
     for _id, _user in dict(self.BOT.antispam).items():
       if _user.get('overload') > 0:  # Пассивное охлаждение

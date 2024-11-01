@@ -204,7 +204,7 @@ if __name__ == '__main__':
             mfilter = BOT.guilds_data.get(str(message.guild.id)).get("discord2tg_bridge").get("from_discord").split(" ")
             # mfilter == ["1090104010005050103:-1000202090908+2060", "1090104010005050103:-1000202090908+2060"]
             for mf in mfilter:
-              if str(message.channel.id) == mf.split(":")[0]:  # "1090104010005050103"
+              if str(message.channel.id) == mf.split(":")[0] and message.content:  # "1090104010005050103"
                 tg_chat_and_thread = mf.split(":")[1].split("+")  # ["-1000202090908", "2060"]
                 host = 'api.telegram.org'
                 url = '/bot' + TG_TOKEN + '/sendMessage'

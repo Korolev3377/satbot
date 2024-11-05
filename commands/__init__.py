@@ -21,6 +21,11 @@ COMMANDS_DICT = {
 
 async def declare_commands(bot):
   bot.logger.info("Запущено обновление команд.")
+  await DB.execute("""CREATE TABLE if not exists d2t_bridge (
+      discord_message_id INTEGER UNIQUE NOT NULL,
+      tg_message_id INTEGER UNIQUE NOT NULL,
+      tg_chat_id INTEGER NOT NULL
+      );""")
   async for g in bot.fetch_guilds():  # Загрузка конфига комманд для каждого сервера. И настройка конфигов пересылки сообщений...
     try:
       status_d2t_0, _ = check_config(bot.guilds_data, [str(g.id), "discord2tg_bridge", "enable_d2t"])

@@ -5,6 +5,7 @@ import json
 
 from discord.ext import tasks
 from environment import TG_TOKEN, tg_req
+from commands.database import DB
 
 loop_seconds = 4.0
 cooling_rate = 1 / 0.3
@@ -44,7 +45,8 @@ class Heart:
               str(upd.get("message").get("message_thread_id") or "0")
             )
             if discord_channel_id:
-              await self.BOT.get_channel(int(discord_channel_id)).send(f"{upd.get('message').get('from').get('username')}:\n{upd.get('message').get('text')}")
+              discord_sended_message = await self.BOT.get_channel(int(discord_channel_id)).send(f"{upd.get('message').get('from').get('username')}:\n{upd.get('message').get('text')}")
+              DB.insert_d2t_data(discord_message_id=discord_sended_message.id, tg_message_id=int(upd.get("message").get("message_thread_id") or "0"), tg_chat_id=int(upd.get("message").get("chat").get("id")))
             else:
               self.BOT.logger.error(["d2t_b: Нету канала сообщения.", upd])
           else:

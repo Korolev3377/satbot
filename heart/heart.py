@@ -58,7 +58,7 @@ class Heart:
                 discord_sended_message = await self.BOT.get_channel(int(discord_channel_id)).send(f"{upd.get('message').get('from').get('username')}:\n{upd.get('message').get('text')}")
               await DB.insert_d2t_data(discord_message_id=discord_sended_message.id, tg_message_id=int(upd.get("message").get("message_id")), tg_chat_id=int(upd.get("message").get("chat").get("id")))
             else:
-              self.BOT.logger.error(["d2t_b: Нету канала сообщения.", upd])
+              self.BOT.logger.error(["d2t_b: Нету канала сообщения.", discord_channel_id, upd])
           else:
             self.BOT.logger.error(["d2t_b: Нету теста сообщения.", upd])
       except:

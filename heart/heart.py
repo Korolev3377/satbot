@@ -10,6 +10,19 @@ from commands.database import DB
 loop_seconds = 4.0
 cooling_rate = 1 / 0.3
 
+
+async def tg_send_message(discord_message_id, discord_channel_id, upd, BOT):
+  discord_channel = BOT.get_channel(int(discord_channel_id))
+  if discord_message_id is False:
+    discord_sended_message = await BOT.get_channel(int(discord_channel_id)).send(
+      f"{upd.get('message').get('from').get('username')}:\n{upd.get('message').get('text')}")
+  else:
+    discord_message = discord_channel.get_partial_message(discord_message_id[0])
+    discord_sended_message = await discord_message.reply(
+      f"{upd.get('message').get('from').get('username')}:\n{upd.get('message').get('text')}")
+  return discord_sended_message
+
+
 class Heart:
   cycle = 0
   step_cycle = 1
@@ -42,27 +55,47 @@ class Heart:
             tg_req("POST", url, values=values)
 
           if upd.get('message').get('text'):
+            discord_channel_id = None
+            for g_id in self.BOT.guilds_data:
+              mfilter = self.BOT.guilds_data.get(g_id).get("discord2tg_bridge").get('from_discord').split(" ")
+              # mfilter == ["0000:-0000+00", "1111:-1111+11"]
+              for mf in mfilter:
+                tg_chat_and_thread = mf.split(":")[1].split("+")  # ["-0000", "00"]
+                if tg_chat_and_thread[0] != str(upd.get("message").get("chat").get("id")):
+                  continue
 
-            discord_channel_id = self.BOT.guilds_data.get(
-              str(upd.get("message").get("chat").get("id"))
-            ).get(
-              str(upd.get("message").get("message_thread_id") or "0")
-            )
+                discord_channel_id = mf.split(":")[0]
+                if upd.get("message").get("is_topic_message"):
+                  if tg_chat_and_thread[1] != str(upd.get("message").get("message_thread_id")):
+                    continue
 
-            if discord_channel_id:
-              if upd.get("message").get("reply_to_message"):
-                discord_message_id = await DB.select_d2t_data(id_sourse="telegramm", message_id=upd.get("message").get("reply_to_message").get("message_id"), tg_chat_id=upd.get("message").get("reply_to_message").get("chat").get("id"))
-                discord_channel = await self.BOT.get_channel(int(discord_channel_id))
-                discord_sended_message = await discord_channel.get_partial_message(discord_message_id).reply(f"{upd.get('message').get('from').get('username')}:\n{upd.get('message').get('text')}")
-              else:
-                discord_sended_message = await self.BOT.get_channel(int(discord_channel_id)).send(f"{upd.get('message').get('from').get('username')}:\n{upd.get('message').get('text')}")
-              await DB.insert_d2t_data(discord_message_id=discord_sended_message.id, tg_message_id=int(upd.get("message").get("message_id")), tg_chat_id=int(upd.get("message").get("chat").get("id")))
-            else:
-              self.BOT.logger.error(["d2t_b: Нету канала сообщения.", discord_channel_id, self.BOT.guilds_data, str(upd.get("message").get("chat").get("id")), str(upd.get("message").get("message_thread_id") or "0")])
+                  if upd.get("message").get("reply_to_message").get("forum_topic_created"):
+                    discord_sended_message = await tg_send_message(False, discord_channel_id, upd, self.BOT)
+                  else:
+                    discord_message_id = await DB.select_d2t_data(id_sourse="telegramm",
+                                                                  message_id=str(upd.get("message").get(
+                                                                    "reply_to_message").get("message_id")),
+                                                                  tg_chat_id=str(upd.get("message").get(
+                                                                    "reply_to_message").get("chat").get("id")))
+                    discord_sended_message = await tg_send_message(discord_message_id, discord_channel_id, upd, self.BOT)
+                else:
+                  if tg_chat_and_thread[1] != "0":
+                    continue
+
+                  if upd.get("message").get("reply_to_message"):
+                    discord_message_id = await DB.select_d2t_data(id_sourse="telegramm",
+                                                                  message_id=str(upd.get("message").get(
+                                                                    "reply_to_message").get("message_id")),
+                                                                  tg_chat_id=str(upd.get("message").get(
+                                                                    "reply_to_message").get("chat").get("id")))
+                    discord_sended_message = await tg_send_message(discord_message_id, discord_channel_id, upd, self.BOT)
+                  else:
+                    discord_sended_message = await tg_send_message(False, discord_channel_id, upd, self.BOT)
+                await DB.insert_d2t_data(discord_message_id=discord_sended_message.id, tg_message_id=int(upd.get("message").get("message_id")), tg_chat_id=int(upd.get("message").get("chat").get("id")))
           else:
-            self.BOT.logger.error(["d2t_b: Нету теста сообщения.", upd])
-      except:
-        pass
+            self.BOT.logger.error(["d2t_b: Нету текста в сообщении.", [upd.get("message").get("chat").get("id"), upd.get("message").get("message_thread_id") or "0"]])
+      except Exception as err:
+        self.BOT.logger.error(f"В сердце была обнаружена ошибка.\nСистема предотвратила критический сбой, но программа все равно работает не правильно.\nСообщение ошибки:\n{err}")
 
     for _id, _user in dict(self.BOT.antispam).items():
       if _user.get('overload') > 0:  # Пассивное охлаждение

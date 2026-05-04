@@ -1,27 +1,34 @@
-import os
-import sys
-import asyncio
-import time
+# ----- Python Standard Library ----- #
 import logging
-import pickle as pik
+import os
+import asyncio
+# ----------------------------------- #
 
-import atexit
-import signal
-
+# ----- Discord Python Library ----- #
 import discord
-from discord.ext import commands
-from discord.app_commands import locale_str as _ls
+# ---------------------------------- #
 
-from commands import declare_commands
-from environment import *
-from heart import Heart
-from translator import T
-from commands.admin import BotsayView
-from commands.database import DB
+# ----- Local Modules ----- #
+from pyModules import Client
+# ------------------------- #
 
-LOGGING_MODE = logging.INFO
+Log = logging.getLogger(__name__)
+with open(os.environ.get("SATBOT_TOKEN_PATH"), 'r') as f:
+    TOKEN = f.read()
+
+async def main():
+    tasks = [
+        client.start(TOKEN, reconnect=True)
+    ]
+    await asyncio.gather(*tasks)
 
 if __name__ == '__main__':
+    logging.basicConfig(filename='log', level=logging.INFO)
+    client = Client(intents=discord.Intents.all())
+    asyncio.run(main())
+
+# TODO: Refactor
+'''if __name__ == '__main__':
     class Bot(commands.Bot):
         def __init__(self):
             super().__init__(command_prefix=CONFIG.CMD_PREFIX,
@@ -71,15 +78,15 @@ if __name__ == '__main__':
                 data = await DB.execute("SELECT cfg_data FROM servers_config WHERE server_id IS ?;", (str(g.id),))
                 try:
                     assert data[0]
-                    self.guilds_data[str(g.id)] = pik.loads(data[0])
+                    self.guilds_data[str(g.id)] = pickle.loads(data[0])
                 except:
                     self.guilds_data[str(g.id)] = CONFIG.DEFAULT_CFG
                     await DB.execute("INSERT INTO servers_config (server_id, cfg_data) VALUES (?, ?);",
-                                     (str(g.id), pik.dumps(self.guilds_data[str(g.id)])))
+                                     (str(g.id), pickle.dumps(self.guilds_data[str(g.id)])))
 
                 self.guilds_data[str(g.id)] = config_autofix(self.guilds_data[str(g.id)], CONFIG.DEFAULT_CFG)
                 await DB.execute("UPDATE servers_config SET cfg_data = ? WHERE server_id = ?;",
-                                 ((pik.dumps(self.guilds_data[str(g.id)])), str(g.id)))
+                                 ((pickle.dumps(self.guilds_data[str(g.id)])), str(g.id)))
 
 
     BOT = Bot()
@@ -277,5 +284,4 @@ if __name__ == '__main__':
         else:
             BOT.logger.error(codes.get(code_1))
 
-
-    BOT.run(TOKEN, log_formatter=BOT.formatter, log_handler=logging.NullHandler(), root_logger=True)
+    BOT.run(TOKEN, log_formatter=BOT.formatter, log_handler=logging.NullHandler(), root_logger=True)'''

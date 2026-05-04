@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="ProjectModuleManager">
-    <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Ivis.iml" filepath="$PROJECT_DIR$/.idea/Ivis.iml" />
-      <module fileurl="file://$USER_HOME$/nn/.idea/nn.iml" filepath="$USER_HOME$/nn/.idea/nn.iml" />
-    </modules>
-  </component>
-</project>

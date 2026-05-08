@@ -34,7 +34,7 @@ if __name__ == '__main__':
     loglevel_numeric = getattr(logging, "INFO")
     if loglevel := kwargs.get("--log"):
         loglevel_numeric = getattr(logging, kwargs.get("--log").upper())
-    logging.basicConfig(filename='log', level=loglevel_numeric, format="%(asctime)s [ %(levelname)-8s ] %(name)-16s -> %(message)s")
+    logging.basicConfig(filename='log', level=loglevel_numeric, format="%(asctime)s [ %(levelname)-8s ] %(name)s:\n%(message)s")
     Log.info("Programm started")
     client = DiscordClient(intents=discord.Intents.all())
     client.add_tree(CommandTree(client=client, commandlist=["ping"]))

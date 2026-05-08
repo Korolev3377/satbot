@@ -29,6 +29,7 @@ async def main():
 
 if __name__ == '__main__':
     logging.basicConfig(filename='log', level=logging.INFO)
+    Log.info("Programm started")
     client = DiscordClient(intents=discord.Intents.all())
     client.add_tree(CommandTree(client=client, commandlist=["ping"]))
     try:

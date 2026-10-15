@@ -6,3 +6,4 @@ log
 *.sh
 *.iml
 *.db
+.settings

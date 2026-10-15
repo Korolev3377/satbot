@@ -8,8 +8,8 @@ import sys
 import discord
 
 # ----- Local Modules ----- #
-from satbot.cli import Cli
-from satbot.commandtree import CommandTree
+from bot.cli import Cli
+from bot.commandtree import CommandTree
 
 Log = logging.getLogger(__name__)
 

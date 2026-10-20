@@ -4,7 +4,7 @@ import logging
 # ----- Discord Python Library ----- #
 import discord
 
-from satbot.menu import Menu
+from bot.menu import Menu
 
 Log = logging.getLogger(__name__)
 

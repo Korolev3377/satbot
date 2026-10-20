@@ -4,7 +4,8 @@ import logging
 # ----- Discord Python Library ----- #
 import discord
 
-from bot.menu import Menu
+from bot.menus import Menu_bot_settings
+from bot.views import View_menu_controls
 
 Log = logging.getLogger(__name__)
 
@@ -26,7 +27,8 @@ async def command(interaction: discord.Interaction):
         "Текстовое поле": "Hello, World!"
     }
     menu = Menu(opening_lines, main_menu_name, items_map)
-    await interaction.followup.send(menu.render())
+    view = View_menu_controls(menu)
+    await interaction.followup.send(menu.render(), view=view)
 
 @command.error
 async def error(interaction: discord.Interaction, e: discord.app_commands.AppCommandError):

@@ -1,7 +1,7 @@
 import json
 
 
-class Menu:
+class Menu_bot_settings:
 
     def __init__(self, opening_lines: list, main_menu_name: str, items_map: dict | None):
         self.opening_lines = opening_lines # Для рендера текста перед меню

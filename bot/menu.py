@@ -29,7 +29,7 @@ class Menu:
         lines = list(self.opening_lines)
 
         if self.path:
-            lines.append("## "+self.path[-1]) # TODO: Не понятно что это, а главное что оно делает. Необходимы тесты
+            lines.append("## "+self.path[-1])
         elif self.main_menu_name:
             lines.append(self.main_menu_name)
         else:

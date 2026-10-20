@@ -23,8 +23,7 @@ async def command(interaction: discord.Interaction):
         "--- Произвольный текст без редактирования ---": None,
         "Переключатель 2": False,
         "Выбрать из списка": [1, "Первое", "Второе", "Третье"],
-        "Текстовое поле": "Hello, World!",
-
+        "Текстовое поле": "Hello, World!"
     }
     menu = Menu(opening_lines, main_menu_name, items_map)
     await interaction.followup.send(menu.render())

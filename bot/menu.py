@@ -55,7 +55,7 @@ class Menu:
                 status = "→ True" if val else "→ False"
                 lines.append(f"{pointer} ● {key}\n    -> {status}") # Пробелы сделаны для красоты, табуляция в monospace дискорда.
             elif isinstance(val, list):
-                lines.append(f"{pointer} ● {key}\n    -> {val.get(val.get(0))}") # АААААААААААААА, УБЕРИТЕ ЭТО!
+                lines.append(f"{pointer} ● {key}\n    -> {val[val[0]]}") # АААААААААААААА, УБЕРИТЕ ЭТО!
             elif isinstance(val, str):
                 lines.append(f"{pointer} ■ {key}\n    -> {val}")
             elif callable(val):

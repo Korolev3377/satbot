@@ -28,8 +28,8 @@ class Cli(discord.Client):
         if message.author == self.user or message.author.bot:
             return
 
-    async def on_member_join(self):
+    async def on_member_join(self, member):
         ...
 
-    async def on_member_remove(self):
+    async def on_member_remove(self, member):
         ...

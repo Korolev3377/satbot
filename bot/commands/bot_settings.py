@@ -36,3 +36,4 @@ async def error(interaction: discord.Interaction, e: discord.app_commands.AppCom
         await interaction.followup.send(f"Clearance insufficient")
     else:
         await interaction.followup.send(f"Unhandled error: {str(e)}")
+        log.error(e)

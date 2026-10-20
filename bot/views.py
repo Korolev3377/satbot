@@ -12,7 +12,7 @@ class View_menu_controls(View):
         # TODO: Добавить объявление кнопок
         
     @button(label="кнопочка!")
-    def btn_up(self, interaction: Interaction):
-        interaction.edit_original_response(content=f"Кнопка была нажата, тест успешен!\nНа кнопку нажал некий {interaction.user.mention}", view=None)
+    async def btn_up(self, interaction: Interaction):
+        await interaction.edit_original_response(content=f"Кнопка была нажата, тест успешен!\nНа кнопку нажал некий {interaction.user.mention}", view=None)
     # TODO: def действия кнопок с обновлением текста
     

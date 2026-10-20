@@ -6,8 +6,8 @@ import discord
 
 # ----- Local Modules ----- #
 from .commands.bot_settings import command as bot_settings_cmd
-from .esteem import command as esteem_cmd
-from .ping import command as ping_cmd
+from .commands.esteem import command as esteem_cmd
+from .commands.ping import command as ping_cmd
 
 Log = logging.getLogger(__name__)
 

@@ -15,14 +15,15 @@ Log = logging.getLogger(__name__)
 @discord.app_commands.checks.has_permissions(administrator=True)
 async def command(interaction: discord.Interaction):
     await interaction.response.defer(thinking=True)
-    opening_lines = ["-# Это тестовая версия меню", "# Меню"]
+    opening_lines = ["-# Тестовая версия меню", "# Настройка бота"]
     main_menu_name = "## Главное меню"
     items_map = {
         "Вложенное меню": {},
         "Переключатель 1": True,
+        "--- Произвольный текст без редактирования ---": None,
         "Переключатель 2": False,
+        "Выбрать из списка": [1, "Первое", "Второе", "Третье"],
         "Текстовое поле": "Hello, World!",
-        "Просто текст": None,
 
     }
     menu = Menu(opening_lines, main_menu_name, items_map)

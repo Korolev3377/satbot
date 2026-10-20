@@ -21,13 +21,6 @@ else:
     exit(1)
 
 
-async def main():
-    async with client:
-        tasks = [
-            client.start(TOKEN, reconnect=True)
-        ]
-        await asyncio.gather(*tasks)
-
 if __name__ == '__main__':
     kwargs = dict(arg.split('=') for arg in sys.argv[1:] if '=' in arg)
     loglevel_numeric = getattr(logging, "INFO")
@@ -43,7 +36,7 @@ if __name__ == '__main__':
     client = Cli(intents=discord.Intents.all())
     client.add_tree(CommandTree(client=client, global_commandlist=["bot_settings"]))
     try:
-        asyncio.run(main())
+        client.run(TOKEN, reconnect=True)
     except KeyboardInterrupt:
         Log.info("Programm closed with KeyboardInterrupt")
 

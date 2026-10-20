@@ -26,13 +26,12 @@ async def command(interaction: discord.Interaction):
         "Выбрать из списка": [1, "Первое", "Второе", "Третье"],
         "Текстовое поле": "Hello, World!"
     }
-    menu = Menu(opening_lines, main_menu_name, items_map)
+    menu = Menu_bot_settings(opening_lines, main_menu_name, items_map)
     view = View_menu_controls(menu)
     await interaction.followup.send(menu.render(), view=view)
 
 @command.error
 async def error(interaction: discord.Interaction, e: discord.app_commands.AppCommandError):
-    await interaction.response.defer(thinking=True, ephemeral=True)
     if isinstance(e, discord.app_commands.MissingPermissions):
         await interaction.followup.send(f"Clearance insufficient")
     else:

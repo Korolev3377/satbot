@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
     Log.info("Programm started")
     client = Cli(intents=discord.Intents.all())
-    client.add_tree(CommandTree(client=client, global_commandlist=["bot_settings"]))
+    client.add_tree(CommandTree(client=client, global_commandlist=["bot_settings_cmd"]))
     try:
         client.run(TOKEN, reconnect=True)
     except KeyboardInterrupt:

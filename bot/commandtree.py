@@ -5,10 +5,17 @@ import logging
 import discord
 
 # ----- Local Modules ----- #
-from .commands import get_command
+from .commands.bot_settings import command as bot_settings_cmd
+from .esteem import command as esteem_cmd
+from .ping import command as ping_cmd
 
 Log = logging.getLogger(__name__)
 
+cmd_dict = {
+    "bot_settings_cmd": bot_settings_cmd,
+    "esteem_cmd": esteem_cmd,
+    "ping_cmd": ping_cmd
+}
 
 class CommandTree(discord.app_commands.CommandTree):
     def __init__(self, global_commandlist, *args, **kwargs):
@@ -20,7 +27,7 @@ class CommandTree(discord.app_commands.CommandTree):
 
         Log.debug(f"Add commands -> {self.global_commandlist}")
         for cmd_name in self.global_commandlist:
-            if command := get_command(cmd_name):
+            if command := cmd_dict.get(cmd_name):
                 self.add_command(command, guild=None)
             else:
                 Log.error(f"Fail to add command <{cmd_name}>")

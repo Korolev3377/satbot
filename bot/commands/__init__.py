@@ -2,6 +2,11 @@
 import logging
 import importlib
 
+# ----- Project Command----- #
+from .bot_settings import command as bot_settings_cmd
+from .esteem import command as esteem_cmd
+from .ping import command as ping_cmd
+
 Log = logging.getLogger(__name__)
 
 def get_command(cmd_name):

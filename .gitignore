@@ -1,5 +1,7 @@
 .idea
 .venv
+.project
+.pydevproject
 __pycache__
 token
 log

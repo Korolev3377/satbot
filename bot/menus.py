@@ -1,4 +1,5 @@
 import json
+from math import ceil
 
 
 class Menu_bot_settings:
@@ -12,7 +13,7 @@ class Menu_bot_settings:
 
         # Навигационные состояния
         self.path = [] # Хранит путь до текущего подменю
-        self.cursor = 0 # Индекс выбранного пункта на текущей странице
+        self.cursor = 0 # Индекс выбранного пункта на глобально в меню
         self.page = 0 # Номер текущей страницы
         self.items_per_page = 5 # Количество пунктов на одной странице
 
@@ -54,8 +55,6 @@ class Menu_bot_settings:
             elif isinstance(val, bool):
                 status = "True" if val else "False"
                 lines.append(f"{pointer} ● {key}\n    → {status}") # Пробелы сделаны для красоты, табуляция в monospace дискорда.
-            elif isinstance(val, list):
-                lines.append(f"{pointer} ● {key}\n    → {val[val[0]]}") # АААААААААААААА, УБЕРИТЕ ЭТО!
             elif isinstance(val, str):
                 lines.append(f"{pointer} ■ {key}\n    → {val}")
             elif callable(val):
@@ -66,6 +65,16 @@ class Menu_bot_settings:
         lines.append("```")
 
         return "\n".join(lines)
+
+    def move_cursor(self, direction):
+        items = self._get_current_items()
+        start = self.page * self.items_per_page
+        end = start + self.items_per_page
+        if (0 <= self.cursor + direction <= len(items)-1) and (start <= self.cursor + direction <= end):
+            self.cursor += direction # TODO: Сделать быстрый переход в конец списка, если нажать Вира на первом пункте
+    def change_page(self, direction):
+        if 0 <= self.page + direction <= ceil(len(self.items_map) / self.items_per_page):
+            self.page += direction # TODO: Сделать быстрый переход в конец страниц, если нажать предыдущую страницу на первой странице
 
     def enter(self) -> None:
         items = self._get_current_items()
@@ -81,8 +90,6 @@ class Menu_bot_settings:
         elif isinstance(val, bool):
             current_menu = self._get_current_menu()
             current_menu[key] = not val
-        elif isinstance(val, list):
-            ...  # TODO
         elif isinstance(val, str):
             ...  # TODO
         elif val is None:
@@ -93,26 +100,6 @@ class Menu_bot_settings:
             self.path.pop()
             self.cursor = 0
             self.page = 0
-
-    def next_page(self) -> None:
-        items = self._get_current_items()
-        total_items = len(items)
-
-        if total_items == 0:
-            return
-
-        self.cursor = (self.cursor + 1) % total_items
-        self.page = self.cursor // self.items_per_page
-
-    def prev_page(self) -> None:
-        items = self._get_current_items()
-        total_items = len(items)
-
-        if total_items == 0:
-            return
-
-        self.cursor = (self.cursor - 1) % total_items
-        self.page = self.cursor // self.items_per_page
 
     def save(self) -> None:
         ... # TODO

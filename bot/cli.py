@@ -18,7 +18,7 @@ class Cli(discord.Client):
         self.tree = cmdtree
 
     async def on_ready(self):
-        Log.info(f"SatBot online\nName: {self.user.name}\nId: {self.user.id}")
+        Log.info(f"SatBot online\nCodename: {self.user.name}\nSerial number: {self.user.id}")
         Log.debug("Syncing command tree...")
         await self.tree.sync()
         Log.debug("Command tree synced!")

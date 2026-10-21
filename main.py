@@ -11,7 +11,7 @@ import discord
 from bot.cli import Cli
 from bot.commandtree import CommandTree
 
-Log = logging.getLogger(__name__)
+Log = logging.getLogger(__name__) # Test comment amend
 
 if token_path := os.environ.get("SATBOT_TOKEN_PATH"):
     with open(os.path.join(token_path), 'r') as f:

@@ -1,18 +1,17 @@
 # ----- Discord Python Library ----- #
 from discord import Interaction
-from discord.ui import View, button
+from discord import ui
 
-class View_menu_controls(View):
+class View_menu_controls(ui.View):
     menu = None
     
     def __init__(self, menu):
+        super().__init__()
         self.menu = menu
-        
-        self.add_item(self.btn_up)
         # TODO: Добавить объявление кнопок
         
-    @button(label="кнопочка!")
-    async def btn_up(self, interaction: Interaction):
-        await interaction.edit_original_response(content=f"Кнопка была нажата, тест успешен!\nНа кнопку нажал некий {interaction.user.mention}", view=None)
+    @ui.button(label="Кнопочка!")
+    async def btn_up(self, interaction: Interaction, button: ui.Button):
+        await interaction.response.edit_message(content=f"Кнопка была нажата, тест успешен!\nНа кнопку нажал некий {interaction.user.mention}", view=None)
     # TODO: def действия кнопок с обновлением текста
     

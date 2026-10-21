@@ -6,6 +6,7 @@ import discord
 
 from bot.menus import Menu_bot_settings
 from bot.views import View_menu_controls
+import traceback
 
 Log = logging.getLogger(__name__)
 
@@ -36,4 +37,6 @@ async def error(interaction: discord.Interaction, e: discord.app_commands.AppCom
         await interaction.followup.send(f"Clearance insufficient")
     else:
         await interaction.followup.send(f"Unhandled error: {str(e)}")
-        log.error(e)
+        exc = getattr(e, "original", e)
+        Log.error("Unhandled error", (type(exc), exc, exc.__traceback__))
+        

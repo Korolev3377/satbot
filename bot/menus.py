@@ -61,20 +61,35 @@ class Menu_bot_settings:
                 lines.append(f"{pointer} ► {key}")
             elif val is None:
                 lines.append(f"{pointer} {key}")
+                
+        lines.append(f"\nСтраница {self.page+1}/{ceil(len(self._get_current_items()) / self.items_per_page)}")
 
         lines.append("```")
 
         return "\n".join(lines)
 
     def move_cursor(self, direction):
-        items = self._get_current_items()
-        start = self.page * self.items_per_page
-        end = start + self.items_per_page
-        if (0 <= self.cursor + direction <= len(items)-1) and (start <= self.cursor + direction <= end):
-            self.cursor += direction # TODO: Сделать быстрый переход в конец списка, если нажать Вира на первом пункте
+        start_of_current_page = self.page * self.items_per_page # Это индекс первого предмета на странице, будь то 0, 5, 10, при items_per_page = 5
+        end_of_current_page = start_of_current_page + self.items_per_page-1 # Это индекс последнего предмета на странице, будь то 4, 9, 14 при полной странице
+        real_end_of_current_page = end_of_current_page + (len(self._get_current_items()[start_of_current_page:end_of_current_page+1]) - self.items_per_page) # Это реальный конец, если страница не полная
+        if start_of_current_page > self.cursor + direction:
+            self.cursor = real_end_of_current_page
+        elif self.cursor + direction > real_end_of_current_page:
+            self.cursor = start_of_current_page
+        else:
+            self.cursor += direction
+                    
     def change_page(self, direction):
-        if 0 <= self.page + direction <= ceil(len(self.items_map) / self.items_per_page):
-            self.page += direction # TODO: Сделать быстрый переход в конец страниц, если нажать предыдущую страницу на первой странице
+        final_page_index = ceil(len(self._get_current_items()) / self.items_per_page)-1
+        if 0 > self.page + direction:
+            self.page = final_page_index
+            self.cursor = self.page * self.items_per_page
+        elif self.page + direction > final_page_index:
+            self.page = 0
+            self.cursor = 0
+        else:
+            self.page += direction
+            self.cursor = self.page * self.items_per_page
 
     def enter(self) -> None:
         items = self._get_current_items()
@@ -85,8 +100,8 @@ class Menu_bot_settings:
 
         if isinstance(val, dict):
             self.path.append(key)
-            self.cursor = 0
             self.page = 0
+            self.cursor = 0
         elif isinstance(val, bool):
             current_menu = self._get_current_menu()
             current_menu[key] = not val

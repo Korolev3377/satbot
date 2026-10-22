@@ -19,11 +19,25 @@ async def command(interaction: discord.Interaction):
     opening_lines = ["-# Тестовая версия меню", "# Настройка бота"]
     main_menu_name = "## Главное меню"
     items_map = {
-        "Вложенное меню": {},
+        "Вложенное меню": {
+            "Элем1": None,
+            "Элем2": None,
+            "Элем3": None,
+            "Элем4": None,
+            "Элем5": None,
+            "Элем6": None,
+            "Элем7": None,
+            "Элем8": None,
+            "Элем9": None,
+            "Элем10": None,
+            "Элем11": None,
+            "Элем12": None,
+            "Элем13": None
+            },
         "Переключатель 1": True,
-        "Произвольный текст без редактирования": None,
         "Переключатель 2": False,
-        "Текстовое поле": "Hello, World!"
+        "Текстовое поле": "Hello, World!",
+        "Произвольный текст без редактирования": None
     }
     menu = Menu_bot_settings(opening_lines, main_menu_name, items_map)
     view = View_menu_controls(menu)

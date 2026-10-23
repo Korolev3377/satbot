@@ -25,7 +25,7 @@ if __name__ == '__main__':
     kwargs = dict(arg.split('=') for arg in sys.argv[1:] if '=' in arg)
     loglevel_numeric = getattr(logging, "INFO")
     if loglevel := kwargs.get("--log"):
-        if loglevel.upper() in ["DEBUG", "INFO", "ERROR", "CRITICAL"]:
+        if loglevel.upper() in ["DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"]:
             loglevel_numeric = getattr(logging, loglevel.upper())
     logging.basicConfig(filename='log', level=loglevel_numeric, format="%(asctime)s [ %(levelname)-8s ] %(name)s:\n%(message)s\n")
 

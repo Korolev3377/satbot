@@ -15,7 +15,7 @@ class Menu_bot_settings:
         self._page = 0 # Номер текущей страницы
         self._items_per_page = 5 # Количество пунктов на одной странице
 
-    def _get_current_items(self) -> list:
+    def _get_current_items_list(self) -> list: # Возвращает список элементов в соответствии с path
         if self._path:
             current = self._path[-1][1]
         else:
@@ -25,7 +25,12 @@ class Menu_bot_settings:
     def _get_current_page(self) -> list:
         start = self._page * self._items_per_page
         end = start + self._items_per_page
-        return self._get_current_items()[start:end]
+        return self._get_current_items_list()[start:end]
+    
+    def get_current_item(self):
+        current_page = self._get_current_page()
+        current_item = current_page[self._cursor]
+        return current_item
 
     def move_cursor(self, d: int) -> None:
         current_page = self._get_current_page()
@@ -37,7 +42,7 @@ class Menu_bot_settings:
             self._cursor += d
                     
     def change_page(self, d: int) -> None:
-        num_of_pages = ceil(len(self._get_current_items()) / self._items_per_page)
+        num_of_pages = ceil(len(self._get_current_items_list()) / self._items_per_page)
         if 0 > self._page + d:
             self._page = num_of_pages-1
             self._cursor = 0
@@ -48,27 +53,31 @@ class Menu_bot_settings:
             self._page += d
             self._cursor = 0
 
-    def enter(self) -> str:
+    def enter(self, input_data: Any = None) -> str:
         current_page = self._get_current_page()
         current_item = current_page[self._cursor]
         
         match current_item[0]:
             case "note":
-                return "note"
+                return
             case "switch":
                 current_item[2] = not current_item[2]
-                return "switch"
+                return
             case "text":
-                return "text"
+                if isinstance(input_data, str):
+                    current_item[2] = input_data
+                return
             case "chooseable":
-                return "chooseable"
+                if isinstance(input_data, int):
+                    current_item[2] = input_data
+                return
             case "menu":
                 self._path.append([current_item[1], current_item[2]])
                 self._page = 0
                 self._cursor = 0
-                return "menu"
+                return
             case _:
-                return ""
+                return
 
     def back(self) -> None:
         if self._path:
@@ -109,13 +118,13 @@ class Menu_bot_settings:
                 case "text":
                     lines.append(f"{pointer} ● {current_item[1]}\n  └─► {current_item[2]}")
                 case "chooseable":
-                    lines.append(f"{pointer} ● {current_item[1]}\n  └─► {current_item[2]}")
+                    lines.append(f"{pointer} ● {current_item[1]}\n  └─► {current_item[3][current_item[2]]}")
                 case "menu":
                     lines.append(f"{pointer} ≡ {current_item[1]}")
                 case _:
                     continue
         
-        num_of_pages = ceil(len(self._get_current_items()) / self._items_per_page)
+        num_of_pages = ceil(len(self._get_current_items_list()) / self._items_per_page)
         lines.append(f"\nСтраница {self._page+1}/{num_of_pages}")
 
         lines.append("```")

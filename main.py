@@ -31,6 +31,8 @@ if __name__ == '__main__':
 
     discordLogger = logging.getLogger('discord')
     discordLogger.setLevel(logging.INFO)
+    discordGatewayLogger = logging.getLogger('discord.gateway')
+    discordGatewayLogger.setLevel(logging.WARN)
 
     Log.info("Programm started")
     client = Cli(intents=discord.Intents.all())
